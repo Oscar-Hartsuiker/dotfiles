@@ -1,0 +1,134 @@
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 12px;
+}
+
+window#waybar {
+  background: #1c1c1c;
+  color: #c0caf5;
+}
+
+/* ── Left ────────────────────────────── */
+
+#custom-tux {
+  color: #7aa2f7;
+  font-size: 14px;
+  padding: 0 8px 0 6px;
+  border-right: 1px solid #1e2030;
+}
+
+#workspaces {
+  padding: 0 4px;
+  border-right: 1px solid #1e2030;
+}
+
+#workspaces button {
+  background: transparent;
+  color: #414868;
+  padding: 0 5px;
+  border-radius: 0;
+  min-width: 18px;
+}
+
+#workspaces button:hover {
+  background: transparent;
+  color: #9aa5ce;
+  box-shadow: none;
+}
+
+#workspaces button.active {
+  background: transparent;
+  color: #7aa2f7;
+  border-bottom: 1px solid #7aa2f7;
+}
+
+#workspaces button.urgent {
+  color: #f7768e;
+}
+
+#taskbar {
+  padding: 0 6px;
+  border-right: 1px solid #1e2030;
+}
+
+#taskbar button {
+  background: transparent;
+  color: #9aa5ce;
+  padding: 0 6px;
+  border-radius: 0;
+  min-height: 0;
+}
+
+#taskbar button:hover {
+  background: #1e2030;
+  color: #c0caf5;
+}
+
+#taskbar button.active {
+  color: #c0caf5;
+  border-bottom: 1px solid #7aa2f7;
+}
+
+/* ── Center ──────────────────────────── */
+
+#clock {
+  color: #bb9af7;
+  padding: 0 12px;
+}
+
+/* ── Right ───────────────────────────── */
+
+#tray {
+  padding: 0 6px 0 8px;
+  border-left: 1px solid #1e2030;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#custom-caffeine {
+  color: #565f89;
+  padding: 0 6px;
+  font-size: 13px;
+}
+
+#custom-caffeine.awake {
+  color: #e0af68;
+}
+
+#pulseaudio {
+  color: #9ece6a;
+  padding: 0 8px;
+}
+
+#pulseaudio.muted {
+  color: #414868;
+}
+
+#network {
+  color: #7dcfff;
+  padding: 0 8px;
+}
+
+#network.disconnected {
+  color: #414868;
+}
+
+#battery {
+  color: #9ece6a;
+  padding: 0 8px 0 6px;
+}
+
+#battery.warning {
+  color: #e0af68;
+}
+
+#battery.critical {
+  color: #f7768e;
+}
+
+#battery.charging,
+#battery.plugged {
+  color: #7dcfff;
+}

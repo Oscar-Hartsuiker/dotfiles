@@ -1,0 +1,18 @@
+
+
+
+background_opacity 1
+hide_on_focus_loss no
+grab_keyboard no
+
+margin_right 0
+margin_left 0
+margin_top 0
+margin_bottom 500
+
+
+
+
+
+
+
