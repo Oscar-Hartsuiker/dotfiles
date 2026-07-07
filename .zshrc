@@ -4,7 +4,16 @@
 #
 # Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md.
 
-
+globalias() {
+  if [[ $LBUFFER =~ '[a-zA-Z0-9]+$' ]]; then
+    zle _expand_alias
+    zle expand-word
+  fi
+  zle self-insert
+}
+zle -N globalias
+bindkey " " globalias
+bindkey "^ " magic-space   # Ctrl+space to insert a literal space without expanding
 
 
 function y() {
@@ -124,6 +133,7 @@ alias media="/run/media/oscar/"
 
 ### DOTFILES  ###
 
+alias dotgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias .kitty="cd ~/.config/kitty"
 alias .zrc="vi ~/.zshrc"
 ##### HYPRLAND
@@ -133,6 +143,14 @@ alias .waybar="cd ~/.config/waybar/ ; lsd"
 alias .rofi="cd .config/rofi/ ; lsd"
 # Add flags to existing aliases.
 alias ls="${aliases[ls]:-ls} -A"
+
+
+
+alias shutdown="hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'"
+
+alias reboot="hyprshutdown -t 'Restarting...' --post-cmd 'reboot'"
+
+
 
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
@@ -147,4 +165,3 @@ export PATH=$HOME/.config/rofi/bin:$PATH
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-alias dotgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'

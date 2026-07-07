@@ -1,6 +1,6 @@
 * {
   font-family: "JetBrainsMono Nerd Font", monospace;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 window#waybar {
@@ -10,7 +10,7 @@ window#waybar {
 
 /* ── Left ────────────────────────────── */
 
-#custom-tux {
+#custom-apps {
   color: #7aa2f7;
   font-size: 14px;
   padding: 0 8px 0 6px;
@@ -27,7 +27,7 @@ window#waybar {
   color: #414868;
   padding: 0 5px;
   border-radius: 0;
-  min-width: 18px;
+  min-width: 20px;
 }
 
 #workspaces button:hover {
@@ -88,12 +88,12 @@ window#waybar {
 }
 
 #custom-caffeine {
-  color: #565f89;
+  color: #f85f89;
   padding: 0 6px;
-  font-size: 13px;
+  font-size: 18px;
 }
 
-#custom-caffeine.awake {
+#custom-caffeine.idle {
   color: #e0af68;
 }
 
@@ -129,6 +129,6 @@ window#waybar {
 }
 
 #battery.charging,
-#battery.plugged {
+#battery.pluggedin {
   color: #7dcfff;
 }

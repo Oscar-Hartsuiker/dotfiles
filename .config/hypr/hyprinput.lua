@@ -88,10 +88,8 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(programs.terminal))
 local closeWindowBind = hl.bind(mainMod .. " + x", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
-hl.bind(
-	mainMod .. " + M",
-	hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'")
-)
+
+hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd("~/.config/rofi/scripts/emoji.sh"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
@@ -100,6 +98,14 @@ hl.bind(mainMod .. " + space", function()
 	hl.exec_cmd("pgrep -x rofi && pkill -x rofi || " .. programs.menu)
 end)
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+
+hl.bind(
+	"SUPER + C",
+	hl.dsp.exec_cmd(
+		"cliphist list | rofi -dmenu -theme ~/.config/rofi/catppuccin-mocha.rasi| cliphist decode | wl-copy"
+	)
+)
+hl.bind("SUPER + ESCAPE", hl.dsp.exec_cmd("pgrep -x rofi && pkill -x rofi || ~/.config/rofi/scripts/powermenu.sh"))
 --hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
 
 -- Move focus with mainMod + arrow keys

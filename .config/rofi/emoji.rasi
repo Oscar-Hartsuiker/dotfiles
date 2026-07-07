@@ -8,13 +8,10 @@
     fg-col2: #f38ba8;
     grey: #6c7086;
     width: 800;
-    font: "JetBrainsMono Nerd Font 12";
+    font: "JetBrainsMono Nerd Font 18";
 }
 
-element-text, element-icon , mode-switcher {
-    background-color: inherit;
-    text-color:       inherit;
-}
+
 
 window {
     height: 300px;
@@ -58,28 +55,44 @@ entry {
 }
 
 listview {
-    border: 0px 0px 0px;
-    padding: 6px 0px 0px;
-    margin: 10px 0px 0px 20px;
-    columns: 2;
-    lines: 5;
+    border: 2px 2px 2px 2px;
+    columns: 9;
+    lines: 6;
     background-color: @bg-col;
 }
+
 
 element {
-    padding: 5px;
+    /* Tell Rofi to ONLY render the text (emoji) and ignore the icon box entirely */
+    children:         [element-text];
+    /* Bring back your original flat, simple container box */
+    padding:          2px;
+    border-radius:    8px;
+    border:           2px;
+    border-color:     transparent;
     background-color: @bg-col;
-    text-color: @fg-col  ;
 }
 
-element-icon {
-    size: 20px;
+element-text {
+    /* Tell Rofi to center the emoji character inside its text box */
+    horizontal-align: 0.5;
+    vertical-align:   0.5;
+    
+    /* Ensure the text box fills the element cleanly */
+    background-color: transparent;
+    text-color:       inherit;
 }
 
 element selected {
-    background-color:  @selected-col ;
-    text-color: @fg-col2  ;
+    /* Your requested selection border */
+    border:           2px;
+    border-color:     @border-col; 
+    border-radius:    8px;
+    
+    background-color: @selected-col;
 }
+
+
 
 mode-switcher {
     spacing: 0;
@@ -96,6 +109,7 @@ button {
 button selected {
   background-color: @bg-col;
   text-color: @blue;
+  border-col: @border-col;
 }
 
 message {
@@ -106,8 +120,6 @@ message {
 }
 
 textbox {
-    padding: 6px;
-    margin: 20px 0px 0px 20px;
     text-color: @blue;
     background-color: @bg-col-light;
     border-color: @border-col;
