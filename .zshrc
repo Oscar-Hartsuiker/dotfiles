@@ -4,16 +4,6 @@
 #
 # Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md.
 
-globalias() {
-  if [[ $LBUFFER =~ '[a-zA-Z0-9]+$' ]]; then
-    zle _expand_alias
-    zle expand-word
-  fi
-  zle self-insert
-}
-zle -N globalias
-bindkey " " globalias
-bindkey "^ " magic-space   # Ctrl+space to insert a literal space without expanding
 
 
 function y() {
@@ -134,24 +124,45 @@ alias media="/run/media/oscar/"
 ### DOTFILES  ###
 
 alias dotgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias .kitty="cd ~/.config/kitty"
+alias .kitty="~/.config/kitty"
 alias .zrc="vi ~/.zshrc"
 ##### HYPRLAND
 alias .hyprwall="vi ~/.config/hypr/hyprpaper.conf"
-alias .hypr="cd ~/.config/hypr/"
-alias .waybar="cd ~/.config/waybar/ ; lsd"
-alias .rofi="cd .config/rofi/ ; lsd"
+alias .hypr="~/.config/hypr/"
+alias .waybar="~/.config/waybar/"
+alias .rofi="~/.config/rofi/"
 # Add flags to existing aliases.
 alias ls="${aliases[ls]:-ls} -A"
-
-
+alias .hyprset="vi ~/.config/hypr/* ~/.config/waybar/* ~/.config/rofi/*"
+alias gtheme="theme=$(gsettings get org.gnome.desktop.interface gtk-theme) && gsettings set org.gnome.desktop.interface gtk-theme '' && sleep 0.1 && gsettings set org.gnome.desktop.interface gtk-theme "$theme"
+"
 
 alias shutdown="hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'"
 
 alias reboot="hyprshutdown -t 'Restarting...' --post-cmd 'reboot'"
 
+# Pacman aliases
+alias pacupdate='sudo pacman -Syu'                     # full system update
+alias pacsearch='pacman -Ss'                            # search repos
+alias pacinstall='sudo pacman -S'                        # install package
+alias pacremove='sudo pacman -Rns'                       # remove package + deps + configs
+alias pacinfo='pacman -Qi'                                # info on installed package
+alias pacinfoall='pacman -Si'                             # info on repo package
+alias paclist='pacman -Qe'                                # list explicitly installed packages
+alias pacorphan='pacman -Qtdq'                            # list orphaned packages
+alias pacclean='sudo pacman -Rns $(pacman -Qtdq)'         # remove orphans
+alias paccache='sudo pacman -Sc'                          # clean package cache (keep installed versions)
+alias paccacheall='sudo pacman -Scc'                      # clean ALL cached packages
+alias pacfiles='pacman -Qo'                               # which package owns a file
+alias pacdeps='pacman -Qi'                                 # (same as pacinfo, shows deps)
+alias pacsize='pacman -Qi | grep -E "Name|Installed Size"' # rough package size listing
+# AUR helper (yay example)
+alias yayupdate='yay -Syu'
+alias yaysearch='yay -Ss'
+alias yayinstall='yay -S'
+alias yayclean='yay -Yc'   # clean unneeded deps
 
-
+alias pacmirror="sudo reflector --country "South Africa,Germany,Netherlands" --age 24 --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
 # Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
 setopt glob_dots     # no special treatment for file names with a leading dot
 setopt no_auto_menu  # require an extra TAB press to open the completion menu
@@ -161,7 +172,21 @@ export EDITOR='nvim'
 
 # Edit .zshrc and add this line
 export PATH=$HOME/.config/rofi/bin:$PATH
-
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+
+globalias() {
+  if [[ $LBUFFER =~ '[a-zA-Z0-9]+$' ]]; then
+    zle _expand_alias
+    zle expand-word
+  fi
+  zle self-insert
+}
+zle -N globalias
+bindkey " " globalias
+bindkey "^ " magic-space   # Ctrl+space to insert a literal space without expanding

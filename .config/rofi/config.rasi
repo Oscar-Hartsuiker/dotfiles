@@ -1,5 +1,5 @@
 configuration{
-    modi: "drun,run,window,combi";
+    modi: "drun,window,run,combi";
     icon-theme: "Papirus";
     show-icons: true;
     terminal: "kitty";
@@ -9,11 +9,11 @@ configuration{
     hide-scrollbar: true;
     display-combi: "   ";
     display-run: "   ";
-    display-drun: " # ";
+    display-drun: "    ";
     display-window: "   ";
     sidebar-mode: false;
     me-accept-entry: "!MousePrimary"; 
-    kb-cancel: "MousePrimary"; 
+    kb-cancel: "MousePrimary,Escape"; 
 }
 
 @theme "catppuccin-mocha"

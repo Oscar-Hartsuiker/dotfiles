@@ -1,17 +1,17 @@
 {
   "layer": "bottom",
   "position": "top",
-  "height": 24,
+  "height": 20,
   "exclusive": true,
   "spacing": 0,
   "modules-left": ["custom/apps", "hyprland/workspaces", "wlr/taskbar"],
   "modules-center": ["clock"],
   "modules-right": [
-    "custom/caffeine",
+    "idle_inhibitor",
     "battery",
     "backlight",
     "pulseaudio",
-    "network",
+    //"network",
     "custom/notifications",
     "tray",
   ],
@@ -26,7 +26,7 @@
   },
   "wlr/taskbar": {
     "format": "{icon}",
-    "icon-size": 15,
+    // "icon-size": 12,
     "icon-theme": "Papirus-Dark",
     "tooltip-format": "{title}",
     "on-click": "activate",
@@ -43,7 +43,7 @@
   },
   "tray": {
     "icon-size": 15,
-    "spacing": 6,
+    "spacing": 8,
     "show-passive-items": false,
   },
   "backlight": {
@@ -65,7 +65,6 @@
     "scroll-step": 2,
     "tooltip": false,
   },
-  "include": ["~/.config/waybar/network.jsonc"],
   "battery": {
     "states": {
       "warning": 70,
@@ -91,13 +90,20 @@
       "0": "󰂜",
     },
     "on-click": "makoctl restore",
-    "on-click-right": "makoctl dismiss --all",
+    "on-click-right": "makoctl dismiss -a --no-history",
     "tooltip": false,
   },
   "custom/apps": {
-    "format": "\uf004",
+    "format": " ",
     "on-click": "pgrep -x rofi && pkill -x rofi || rofi -show drun",
     "tooltip": false,
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": " ",
+      "deactivated": " ",
+    },
   },
   "custom/caffeine": {
     "exec": "~/.config/waybar/scripts/caffeine.sh",

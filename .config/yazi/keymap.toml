@@ -1,3 +1,20 @@
+
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi"
+on = ";"
+run = "plugin bunny"
+
+# Optionally, add another keymap to immediately fuzzy search bookmarks
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi fuzzy search"
+on = "'"
+run = "plugin bunny fuzzy"
+ 
+[[mgr.prepend_keymap]]
+on   = "O"
+run  = 'shell " %s" --interactive  --block --cursor=0'
+desc = "Open with yourcommand (editable prompt)"
+
 [[mgr.prepend_keymap]]
 on  = ["C", "m"]
 run = "plugin mount"
@@ -58,7 +75,7 @@ run  = "plugin swayimg"
 desc = "Open hovered image fullscreen in swayimg"
 
 [[mgr.prepend_keymap]]
-on = [ ".", "s" ]
+on = [ "C", "s" ]
 run  = "plugin what-size"
 desc = "Calc size of selection or cwd" 
 

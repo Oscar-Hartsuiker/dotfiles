@@ -6,7 +6,7 @@ hide_window_decorations no
  bold_italic_font JetBrains Mono Bold Italic
 
 
-font_size 13.0
+font_size 12.0
 # Nerd Fonts v2.3.3
 symbol_map U+e738,U+e256,U+db82,U+df37,U+2615,U+279c,U+2718,U+21e1,U+2638,U+25ac  Symbols Nerd Font Mono
 # Nerd Fonts v2.3.3
@@ -171,15 +171,10 @@ map kitty_mod+p kitten hints --type=regex --regex="(?<path>(?:\/[\w-_^ ]+)+\/?(?
 notify_on_cmd_finish invisible 10.0 notify
 
 
-# BEGIN_KITTY_FONTS
-font_family      family="JetBrainsMono Nerd Font Mono"
-bold_font        auto
-italic_font      auto
-bold_italic_font auto
-# END_KITTY_FONTS
+
 
 
 # BEGIN_KITTY_THEME
-# Tokyo Night
+# Catppuccin-Mocha
 include current-theme.conf
 # END_KITTY_THEME

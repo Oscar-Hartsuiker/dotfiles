@@ -1,10 +1,16 @@
 * {
   font-family: "JetBrainsMono Nerd Font", monospace;
-  font-size: 16px;
+  font-size: 14px;
+  min-height: 0;
 }
 
+/* Reset the main window wrapper */
 window#waybar {
-  background: #1c1c1c;
+  padding: 0;
+  margin: 0;
+}
+window#waybar {
+  background: #1e1e2e;
   color: #c0caf5;
 }
 
@@ -12,7 +18,7 @@ window#waybar {
 
 #custom-apps {
   color: #7aa2f7;
-  font-size: 14px;
+  /* font-size: 12px; */
   padding: 0 8px 0 6px;
   border-right: 1px solid #1e2030;
 }
@@ -90,15 +96,16 @@ window#waybar {
 #custom-caffeine {
   color: #f85f89;
   padding: 0 6px;
-  font-size: 18px;
 }
-
-#custom-caffeine.idle {
+#idle_inhibitor {
   color: #e0af68;
+}
+#idle_inhibitor.activated {
+  color: #fff787;
 }
 
 #pulseaudio {
-  color: #9ece6a;
+  color: #ff966c;
   padding: 0 8px;
 }
 
@@ -110,13 +117,15 @@ window#waybar {
   color: #7dcfff;
   padding: 0 8px;
 }
-
+#backlight {
+  color: #7dcfff;
+}
 #network.disconnected {
   color: #414868;
 }
 
 #battery {
-  color: #9ece6a;
+  color: #8efeaa;
   padding: 0 8px 0 6px;
 }
 
@@ -129,6 +138,6 @@ window#waybar {
 }
 
 #battery.charging,
-#battery.pluggedin {
+#battery.plugged {
   color: #7dcfff;
 }
