@@ -1,0 +1,10 @@
+-- lua/config/theme-signal.lua
+local signal = vim.uv.new_signal()
+
+signal:start("sigusr1", function()
+  vim.schedule(function()
+    local mode = vim.fn.trim(vim.fn.system("cat " .. vim.fn.expand("~/.cache/theme-mode")))
+    vim.o.background = mode
+    vim.cmd("colorscheme gruvbox")
+  end)
+end)

@@ -1,0 +1,33 @@
+binds {
+    Alt+space hotkey-overlay-title="Spotlight Bar: Toggle" { spawn "dms" "ipc" "call" "spotlight-bar" "toggle"; }
+    Mod+Apostrophe hotkey-overlay-title="Clipboard: Toggle" { spawn "dms" "ipc" "call" "clipboard" "toggle"; }
+    Mod+B hotkey-overlay-title="Default Web Browser: Open" { spawn "dms" "ipc" "call" "defaultApp" "browser"; }
+    Mod+Ctrl+S hotkey-overlay-title="Bar: Toggle Auto-Hide (Primary)" { spawn "dms" "ipc" "call" "bar" "toggleAutoHide" "index" "0"; }
+    Mod+Delete hotkey-overlay-title="Power Menu: Toggle" { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+N hotkey-overlay-title="Notifications: Toggle" { spawn "dms" "ipc" "call" "notifications" "toggle"; }
+    Mod+P hotkey-overlay-title="Settings: Toggle" { spawn "dms" "ipc" "call" "settings" "toggle"; }
+    Mod+Q hotkey-overlay-title="Bar: Toggle (Primary)" { spawn "dms" "ipc" "call" "bar" "toggle" "index" "0"; }
+    Mod+S hotkey-overlay-title="Dock: Toggle Auto-Hide" { spawn "dms" "ipc" "call" "dock" "toggleAutoHide"; }
+    Mod+Shift+S hotkey-overlay-title="Dock: Toggle" { spawn "dms" "ipc" "call" "dock" "toggle"; }
+    Mod+Shift+Slash hotkey-overlay-title="Keybinds Cheatsheet: Toggle" { spawn "dms" "ipc" "call" "keybinds" "toggle" "niri"; }
+    Mod+Slash hotkey-overlay-title="Notepad: Toggle" { spawn "dms" "ipc" "call" "notepad" "toggle"; }
+    Mod+Y hotkey-overlay-title="Wallpaper Browser" { spawn "dms" "ipc" "call" "dankdash" "wallpaper"; }
+    Mod+space hotkey-overlay-title="Default Launcher: Toggle" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
+    Mod+D repeat=false allow-when-locked=true allow-inhibiting=false { spawn "sh" "-c" "rofi -show combi -combi-modi window,drun,run,fileManage"; }
+    Mod+M hotkey-overlay-title="Fullscreen" { fullscreen-window; }
+    Mod+Shift+Z { spawn "sh" "-c" "niri msg action set-column-width 50%; niri msg action focus-column-right; niri msg action set-column-width 50%; niri msg action focus-column-left; niri msg action focus-column-right; niri msg action focus-column-left"; }
+    Mod+T hotkey-overlay-title="Toggle Tabbed" { toggle-column-tabbed-display; }
+    Mod+Z hotkey-overlay-title="Split" { spawn "sh" "-c" "niri msg action set-column-width 50%; niri msg action focus-column-left; niri msg action set-column-width 50%; niri msg action focus-column-right; niri msg action focus-column-left; niri msg action focus-column-right"; }
+    Mod+Shift+Delete { quit; }
+    Mod+Alt+Return hotkey-overlay-title="rmpc" { spawn "ghostty" "-e" "rmpc"; }
+    Mod+O { spawn "obsidian"; }
+    Mod+Return hotkey-overlay-title="terminal" { spawn "ghostty"; }
+    Mod+Shift+B { spawn "firefox"; }
+    Mod+Shift+E hotkey-overlay-title="Yazi" { spawn "ghostty" "-e" "yazi"; }
+    Mod+Shift+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
+    Mod+W { spawn "zapzap"; }
+    Mod+A repeat=false { toggle-overview; }
+    Mod+Alt+space repeat=false hotkey-overlay-title="Overview" { toggle-overview; }
+}

@@ -1,0 +1,83 @@
+
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi"
+on = ";"
+run = "plugin bunny"
+
+# Optionally, add another keymap to immediately fuzzy search bookmarks
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi fuzzy search"
+on = "'"
+run = "plugin bunny fuzzy"
+ 
+[[mgr.prepend_keymap]]
+on   = "O"
+run  = 'shell " %s" --interactive  --block --cursor=0'
+desc = "Open with yourcommand (editable prompt)"
+
+[[mgr.prepend_keymap]]
+on  = ["C", "m"]
+run = "plugin mount"
+
+[[mgr.prepend_keymap]]
+on = [ "Z" ]
+run = 'plugin custom-shell zsh' # OR 'plugin custom-shell -- zsh'
+desc = "custom-shell as default"
+
+[[mgr.prepend_keymap]]
+on   = "R"
+run  = "plugin omni-trash"
+desc = "Open Omni Trash"
+
+[[mgr.prepend_keymap]]
+on   = ["C", "t"]
+run  = "plugin omni-trash"
+desc = "Open Omni Trash"
+# Copy yanked files to the system clipboard
+[[mgr.prepend_keymap]]
+on  = "y"
+run = [ "yank", 'plugin clipboard -- --action=copy' ]
+
+# Paste files from the system clipboard into the current directory
+[[mgr.prepend_keymap]]
+on  = ["C", "p"] 
+run = [ 'paste clipboard' ]
+
+[[mgr.prepend_keymap]]
+on   = [ "C", "s" ]
+run  = "plugin kdeconnect-send"
+desc = "Send selected files via KDE Connect"
+
+[[mgr.prepend_keymap]]
+on   = "T"
+run  = ["plugin toggle-pane min-preview", "plugin toggle-pane min-parent"]
+desc = "show or hide the preview and parent panes"
+
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "plugin toggle-pane max-preview"
+desc = "Maximize or restore the preview pane"
+
+
+[[manager.prepend_keymap]]
+on   = [ "C", "w" ]
+run  = "close"
+desc = "Close the current tab, or quit if it's last"
+
+[[manager.prepend_keymap]]
+on   = [ "C", "w" ]
+run  = "close"
+desc = "Close the current tab, or quit if it's last"
+
+[[mgr.prepend_keymap]]
+on   = ["c", "i"]
+run  = "plugin swayimg"
+desc = "Open hovered image fullscreen in swayimg"
+
+[[mgr.prepend_keymap]]
+on = [ "C", "s" ]
+run  = "plugin what-size"
+desc = "Calc size of selection or cwd" 
+
+
+

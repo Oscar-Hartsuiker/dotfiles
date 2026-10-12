@@ -1,0 +1,44 @@
+[[plugin.deps]]
+use = "yazi-rs/plugins:mount"
+rev = "c591a36"
+hash = "b95f898e6dc60b52edbc415952e14395"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:toggle-pane"
+rev = "c591a36"
+hash = "5b2fbef7d1513ce38ff72623a071a5e"
+
+[[plugin.deps]]
+use = "pirafrank/what-size"
+rev = "ec94d9a"
+hash = "4b546f609ab8630a083cecf9ab5091d2"
+
+[[plugin.deps]]
+use = "goon/omni-trash"
+rev = "3c2a992"
+hash = "6e5bf967707c8c9b6495cf5863ff497f"
+
+[[plugin.deps]]
+use = "grappas/wl-clipboard"
+rev = "8cc5524"
+hash = "5c587834c274dca9059092714ece1f18"
+
+[[plugin.deps]]
+use = "Deepak22903/kdeconnect-send"
+rev = "06674d1"
+hash = "869884767c2ef592bfb7f5764f8fcae3"
+
+[[plugin.deps]]
+use = "coder0x6675/osc7"
+rev = "ae73046"
+hash = "4f73595837992eeefcb525c0a95b92ba"
+
+[[plugin.deps]]
+use = "stelcodes/bunny"
+rev = "71b14a3"
+hash = "18a2829738214fe9bca99a2fef19113d"
+
+[[flavor.deps]]
+use = "ZimCodes/yazi-flavors:obsidian-glow"
+rev = "c64630b"
+hash = "cbc1d946c81cff90db37b0c696f13b17"

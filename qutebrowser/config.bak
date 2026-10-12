@@ -1,0 +1,379 @@
+# insert mode click
+
+c.input.insert_mode.auto_enter = True
+c.input.insert_mode.auto_leave = False
+
+# Filter hint
+
+
+# ============================================================
+# CATPPUCCIN THEME SETUP
+# ============================================================
+
+import os
+import sys
+
+config.load_autoconfig(True)
+import os
+
+config.load_autoconfig(True)
+
+dark_flag = "/tmp/qutebrowser-gruvbox-dark"
+light_flag = "/tmp/qutebrowser-gruvbox-light"
+
+if os.path.exists(dark_flag) or os.path.exists(light_flag):
+    if os.path.exists(dark_flag):
+        theme = os.path.expanduser("~/.config/qutebrowser/gruvbox/gruvbox-dark.py")
+        if os.path.exists(theme):
+            config.source(theme)
+        c.colors.webpage.preferred_color_scheme = "dark"
+        c.colors.webpage.darkmode.enabled = True
+        # c.colors.webpage.bg = "black"
+    else:  # light flag exists
+        theme = os.path.expanduser("~/.config/qutebrowser/gruvbox/gruvbox-light.py")
+        if os.path.exists(theme):
+            config.source(theme)
+        c.colors.webpage.preferred_color_scheme = "light"
+        c.colors.webpage.darkmode.enabled = False
+        c.colors.webpage.bg = "#FBF1C7"
+    # Optional: set a default theme if neither flag exists
+    # else:
+    # sys.path.insert(0, os.path.expanduser("~/.config/qutebrowser/catppuccin"))
+    # from setup import setup as catppuccin_setup
+
+    # if os.path.exists("/tmp/qutebrowser-mocha"):
+    # catppuccin_setup(c, "mocha")
+    # c.colors.webpage.preferred_color_scheme = "dark"
+    # c.colors.webpage.darkmode.enabled = True
+    # c.colors.webpage.bg = "black"
+    # else:
+    # catppuccin_setup(c, "latte")
+    # c.colors.webpage.preferred_color_scheme = "light"
+    # c.colors.webpage.darkmode.enabled = False
+# c.colors.webpage.bg = "white"
+# ============================================================
+
+# KEY BINDINGS
+# ============================================================
+
+config.bind("<Ctrl+/>", "hint links spawn --detach mpv {hint-url}")
+
+
+# ============================================================
+# SETTINGS
+# ============================================================
+
+# When to show a changelog after qutebrowser was upgraded.
+# Type: String
+# Valid values:
+#   - major: Show changelog for major upgrades (e.g. v2.0.0 -> v3.0.0).
+#   - minor: Show changelog for major and minor upgrades (e.g. v2.0.0 -> v2.1.0).
+#   - patch: Show changelog for major, minor and patch upgrades (e.g. v2.0.0 -> v2.0.1).
+#   - never: Never show changelog after upgrades.
+c.changelog_after_upgrade = "never"
+
+# Turn on Qt HighDPI scaling. This is equivalent to setting
+# QT_ENABLE_HIGHDPI_SCALING=1 (Qt >= 5.14) in the environment. It's off
+# by default as it can cause issues with some bitmap fonts. As an
+# alternative to this, it's possible to set font sizes and the
+# `zoom.default` setting.
+# Type: Bool
+c.qt.highdpi = False
+c.zoom.default = 150
+# Always restore open sites when qutebrowser is reopened. Without this
+# option set, `:wq` (`:quit --save`) needs to be used to save open tabs
+# (and restore them), while quitting qutebrowser in any other way will
+# not save/restore the session. By default, this will save to the
+# session which was last loaded. This behavior can be customized via the
+# `session.default_name` setting.
+# Type: Bool
+c.auto_save.session = True
+
+# Which cookies to accept. With QtWebEngine, this setting also controls
+# other features with tracking capabilities similar to those of cookies;
+# including IndexedDB, DOM storage, filesystem API, service workers, and
+# AppCache. Note that with QtWebKit, only `all` and `never` are
+# supported as per-domain values. Setting `no-3rdparty` or `no-
+# unknown-3rdparty` per-domain on QtWebKit will have the same effect as
+# `all`. If this setting is used with URL patterns, the pattern gets
+# applied to the origin/first party URL of the page making the request,
+# not the request URL. With QtWebEngine 5.15.0+, paths will be stripped
+# from URLs, so URL patterns using paths will not match. With
+# QtWebEngine 5.15.2+, subdomains are additionally stripped as well, so
+# you will typically need to set this setting for `example.com` when the
+# cookie is set on `somesubdomain.example.com` for it to work properly.
+# To debug issues with this setting, start qutebrowser with `--debug
+# --logfilter network --debug-flag log-cookies` which will show all
+# cookies being set.
+# Type: String
+# Valid values:
+#   - all: Accept all cookies.
+#   - no-3rdparty: Accept cookies from the same origin only. This is known to break some sites, such as GMail.
+#   - no-unknown-3rdparty: Accept cookies from the same origin only, unless a cookie is already set for the domain. On QtWebEngine, this is the same as no-3rdparty.
+#   - never: Don't accept cookies at all.
+c.content.cookies.accept = "no-3rdparty"
+
+# Which cookies to accept. With QtWebEngine, this setting also controls
+# other features with tracking capabilities similar to those of cookies;
+# including IndexedDB, DOM storage, filesystem API, service workers, and
+# AppCache. Note that with QtWebKit, only `all` and `never` are
+# supported as per-domain values. Setting `no-3rdparty` or `no-
+# unknown-3rdparty` per-domain on QtWebKit will have the same effect as
+# `all`. If this setting is used with URL patterns, the pattern gets
+# applied to the origin/first party URL of the page making the request,
+# not the request URL. With QtWebEngine 5.15.0+, paths will be stripped
+# from URLs, so URL patterns using paths will not match. With
+# QtWebEngine 5.15.2+, subdomains are additionally stripped as well, so
+# you will typically need to set this setting for `example.com` when the
+# cookie is set on `somesubdomain.example.com` for it to work properly.
+# To debug issues with this setting, start qutebrowser with `--debug
+# --logfilter network --debug-flag log-cookies` which will show all
+# cookies being set.
+# Type: String
+# Valid values:
+#   - all: Accept all cookies.
+#   - no-3rdparty: Accept cookies from the same origin only. This is known to break some sites, such as GMail.
+#   - no-unknown-3rdparty: Accept cookies from the same origin only, unless a cookie is already set for the domain. On QtWebEngine, this is the same as no-3rdparty.
+#   - never: Don't accept cookies at all.
+config.set("content.cookies.accept", "all", "chrome-devtools://*")
+
+# Which cookies to accept. With QtWebEngine, this setting also controls
+# other features with tracking capabilities similar to those of cookies;
+# including IndexedDB, DOM storage, filesystem API, service workers, and
+# AppCache. Note that with QtWebKit, only `all` and `never` are
+# supported as per-domain values. Setting `no-3rdparty` or `no-
+# unknown-3rdparty` per-domain on QtWebKit will have the same effect as
+# `all`. If this setting is used with URL patterns, the pattern gets
+# applied to the origin/first party URL of the page making the request,
+# not the request URL. With QtWebEngine 5.15.0+, paths will be stripped
+# from URLs, so URL patterns using paths will not match. With
+# QtWebEngine 5.15.2+, subdomains are additionally stripped as well, so
+# you will typically need to set this setting for `example.com` when the
+# cookie is set on `somesubdomain.example.com` for it to work properly.
+# To debug issues with this setting, start qutebrowser with `--debug
+# --logfilter network --debug-flag log-cookies` which will show all
+# cookies being set.
+# Type: String
+# Valid values:
+#   - all: Accept all cookies.
+#   - no-3rdparty: Accept cookies from the same origin only. This is known to break some sites, such as GMail.
+#   - no-unknown-3rdparty: Accept cookies from the same origin only, unless a cookie is already set for the domain. On QtWebEngine, this is the same as no-3rdparty.
+#   - never: Don't accept cookies at all.
+config.set("content.cookies.accept", "all", "devtools://*")
+
+# Value to send in the `Accept-Language` header. Note that the value
+# read from JavaScript is always the global value.
+# Type: String
+config.set("content.headers.accept_language", "", "https://matchmaker.krunker.io/*")
+
+# User agent to send.  The following placeholders are defined:  *
+# `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
+# The underlying WebKit version (set to a fixed value   with
+# QtWebEngine). * `{qt_key}`: "Qt" for QtWebKit, "QtWebEngine" for
+# QtWebEngine. * `{qt_version}`: The underlying Qt version. *
+# `{upstream_browser_key}`: "Version" for QtWebKit, "Chrome" for
+# QtWebEngine. * `{upstream_browser_version}`: The corresponding
+# Safari/Chrome version. * `{upstream_browser_version_short}`: The
+# corresponding Safari/Chrome   version, but only with its major
+# version. * `{qutebrowser_version}`: The currently running qutebrowser
+# version.  The default value is equal to the default user agent of
+# QtWebKit/QtWebEngine, but with the `QtWebEngine/...` part removed for
+# increased compatibility.  Note that the value read from JavaScript is
+# always the global value.
+# Type: FormatString
+config.set(
+    "content.headers.user_agent",
+    "Mozilla/5.0 ({os_info}; rv:149.0) Gecko/20100101 Firefox/149.0",
+    "https://accounts.google.com/*",
+)
+
+# User agent to send.  The following placeholders are defined:  *
+# `{os_info}`: Something like "X11; Linux x86_64". * `{webkit_version}`:
+# The underlying WebKit version (set to a fixed value   with
+# QtWebEngine). * `{qt_key}`: "Qt" for QtWebKit, "QtWebEngine" for
+# QtWebEngine. * `{qt_version}`: The underlying Qt version. *
+# `{upstream_browser_key}`: "Version" for QtWebKit, "Chrome" for
+# QtWebEngine. * `{upstream_browser_version}`: The corresponding
+# Safari/Chrome version. * `{upstream_browser_version_short}`: The
+# corresponding Safari/Chrome   version, but only with its major
+# version. * `{qutebrowser_version}`: The currently running qutebrowser
+# version.  The default value is equal to the default user agent of
+# QtWebKit/QtWebEngine, but with the `QtWebEngine/...` part removed for
+# increased compatibility.  Note that the value read from JavaScript is
+# always the global value.
+# Type: FormatString
+config.set(
+    "content.headers.user_agent",
+    "Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {qt_key}/{qt_version} {upstream_browser_key}/{upstream_browser_version_short} Safari/{webkit_version}",
+    "https://gitlab.gnome.org/*",
+)
+
+# Load images automatically in web pages.
+# Type: Bool
+config.set("content.images", True, "chrome-devtools://*")
+
+# Load images automatically in web pages.
+# Type: Bool
+config.set("content.images", True, "devtools://*")
+
+# Enable JavaScript.
+# Type: Bool
+config.set("content.javascript.enabled", True, "chrome-devtools://*")
+
+# Enable JavaScript.
+# Type: Bool
+config.set("content.javascript.enabled", True, "devtools://*")
+
+# Enable JavaScript.
+# Type: Bool
+config.set("content.javascript.enabled", True, "chrome://*/*")
+
+# Enable JavaScript.
+# Type: Bool
+config.set("content.javascript.enabled", True, "qute://*/*")
+
+# Allow locally loaded documents to access remote URLs.
+# Type: Bool
+config.set(
+    "content.local_content_can_access_remote_urls",
+    True,
+    "file:///home/oscar/.local/share/qutebrowser/userscripts/*",
+)
+
+# Allow locally loaded documents to access other local URLs.
+# Type: Bool
+config.set(
+    "content.local_content_can_access_file_urls",
+    False,
+    "file:///home/oscar/.local/share/qutebrowser/userscripts/*",
+)
+
+# Editor (and arguments) to use for the `edit-*` commands. The following
+# placeholders are defined:  * `{file}`: Filename of the file to be
+# edited. * `{line}`: Line in which the caret is found in the text. *
+# `{column}`: Column in which the caret is found in the text. *
+# `{line0}`: Same as `{line}`, but starting from index 0. * `{column0}`:
+# Same as `{column}`, but starting from index 0.
+# Type: ShellCommand
+c.editor.command = ["foot", "nvim", "-f", "{file}", "-c", "normal {line}G{column0}l"]
+
+# Command (and arguments) to use for selecting a single folder in forms.
+# The command should write the selected folder path to the specified
+# file or stdout. The following placeholders are defined: * `{}`:
+# Filename of the file to be written to. If not contained in any
+# argument, the   standard output of the command is read instead.
+# Type: ShellCommand
+c.fileselect.folder.command = ["foot", "-e", "ranger", "--choosedir={}"]
+
+# Enable smooth scrolling for web pages. Note smooth scrolling does not
+# work with the `:scroll-px` command.
+# Type: Bool
+
+# Force hardware acceleration and smooth animation flags
+c.scrolling.smooth = True
+
+
+# Bind keys to smaller, high-frequency movement increments
+
+# The syntax is: scroll-px [X_pixels] [Y_pixels]
+# Positive Y values scroll down, negative Y values scroll up.
+
+# config.bind("j", "scroll-px 0 25")
+# config.bind("k", "scroll-px 0 -25")
+
+
+c.qt.args += [
+    "enable-smooth-scrolling",
+    "num-raster-threads=4",
+    "enable-accelerated-video-decode",
+    "enable-gpu-rasterization",
+    "ignore-gpu-blocklist",
+]
+# How to behave when the last tab is closed. If the
+# `tabs.tabs_are_windows` setting is set, this is ignored and the
+# behavior is always identical to the `close` value.
+# Type: String
+# Valid values:
+#   - ignore: Don't do anything.
+#   - blank: Load a blank page.
+#   - startpage: Load the start page.
+#   - default-page: Load the default page.
+#   - close: Close the window.
+c.tabs.last_close = "default-page"
+
+# Padding (in pixels) around text for tabs.
+# Type: Padding
+c.tabs.padding = {"bottom": 2, "left": 0, "right": 0, "top": 2}
+
+# Position of the tab bar.
+# Type: Position
+# Valid values:
+#   - top
+#   - bottom
+#   - left
+#   - right
+c.tabs.position = "top"
+
+# Alignment of the text inside of tabs.
+# Type: TextAlignment
+# Valid values:
+#   - left
+#   - right
+#   - center
+c.tabs.title.alignment = "left"
+
+# Page to open if :open -t/-b/-w is used without URL. Use `about:blank`
+# for a blank page.
+# Type: FuzzyUrl
+c.url.default_page = "about:blank"
+
+# Search engines which can be used via the address bar.  Maps a search
+# engine name (such as `DEFAULT`, or `ddg`) to a URL with a `{}`
+# placeholder. The placeholder will be replaced by the search term, use
+# `{{` and `}}` for literal `{`/`}` braces.  The following further
+# placeholds are defined to configure how special characters in the
+# search terms are replaced by safe characters (called 'quoting'):  *
+# `{}` and `{semiquoted}` quote everything except slashes; this is the
+# most   sensible choice for almost all search engines (for the search
+# term   `slash/and&amp` this placeholder expands to `slash/and%26amp`).
+# * `{quoted}` quotes all characters (for `slash/and&amp` this
+# placeholder   expands to `slash%2Fand%26amp`). * `{unquoted}` quotes
+# nothing (for `slash/and&amp` this placeholder   expands to
+# `slash/and&amp`). * `{0}` means the same as `{}`, but can be used
+# multiple times.  The search engine named `DEFAULT` is used when
+# `url.auto_search` is turned on and something else than a URL was
+# entered to be opened. Other search engines can be used by prepending
+# the search engine name to the search term, e.g. `:open google
+# qutebrowser`.
+# Type: Dict
+c.url.searchengines = {"DEFAULT": "https://google.com/search?q={}"}
+
+# Page(s) to open at the start.
+# Type: List of FuzzyUrl, or FuzzyUrl
+c.url.start_pages = "about:blank"
+
+# Default font families to use. Whenever "default_family" is used in a
+# font setting, it's replaced with the fonts listed here. If set to an
+# empty value, a system-specific monospace default is used.
+# Type: List of Font, or Font
+c.fonts.default_family = []
+
+# Default font size to use. Whenever "default_size" is used in a font
+# setting, it's replaced with the size listed here. Valid values are
+# either a float value with a "pt" suffix, or an integer value with a
+# "px" suffix.
+# Type: String
+c.fonts.default_size = "16pt"
+
+# Default font size (in pixels) for regular text.
+# Type: Int
+c.fonts.web.size.default = 18
+
+# Default font size (in pixels) for fixed-pitch text.
+# Type: Int
+c.fonts.web.size.default_fixed = 18
+
+# Minimum logical font size (in pixels) that is applied when zooming
+# out.
+# Type: Int
+c.fonts.web.size.minimum_logical = 16

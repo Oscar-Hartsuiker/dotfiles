@@ -1,0 +1,29 @@
+
+# theme = light:"Gruvbox Light",dark:"Gruvbox Dark"
+
+#font-family = Google Sans Code Mono Nerd
+#font-family = Martian Mono Nerd
+#font-family = JetBrains Mono Nerd
+#font-size = 16
+font-feature = -calt
+font-feature = -liga
+font-feature = -dlig
+cursor-style = bar
+cursor-style-blink = false
+
+scrollback-limit = 100000000
+
+copy-on-select = true
+
+window-decoration = true
+window-padding-x = 8
+window-padding-y = 8
+
+
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+
+
+# Tames high-resolution or fast wheel events down to standard line counts
+mouse-scroll-multiplier = precision:0.1,discrete:1

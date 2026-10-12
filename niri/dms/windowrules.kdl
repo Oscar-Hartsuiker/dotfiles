@@ -1,0 +1,26 @@
+// DMS Window Rules - Managed by DankMaterialShell
+// Do not edit manually - changes may be overwritten
+
+// @id=wr_1789725390132061141 @name=Ardour-8.12.0~ds
+window-rule {
+    match app-id="^Ardour-8.12.0~ds$"
+    open-floating true
+    open-focused true
+}
+
+// @id=wr_1789725607305511375 @name=org.rncbc.qjackctl
+window-rule {
+    match app-id="^org.rncbc.qjackctl$"
+    open-floating true
+    default-floating-position x=12 y=12 relative-to="top-right"
+}
+
+// @id=wr_1790768168217978284 @name=chrome-akpamiohjfcnimfljfndmaldlcfphjmp-Default
+window-rule {
+    match app-id="^chrome-akpamiohjfcnimfljfndmaldlcfphjmp-Default$" title="Instagram"
+}
+
+// @id=wr_1790768220075220840 @name=firefox-esr
+window-rule {
+    match app-id="^firefox-esr$"
+}

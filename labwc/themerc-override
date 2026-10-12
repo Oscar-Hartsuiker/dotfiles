@@ -1,0 +1,13 @@
+border.width: 2
+window.active.border.color: #121318
+window.inactive.border.color: #121318
+window.active.title.bg.color: #121318
+window.inactive.title.bg.color: #121318
+window.active.button.unpressed.image.color: #ffffff
+window.inactive.button.unpressed.image.color: #ffffff
+window.active.label.text.color: #FFFFFF
+window.inactive.label.text.color: #FFFFFF
+window.button.width: 28
+window.button.height: 28
+window.button.hover.bg.corner-radius: 15
+window.button.hover.bg.shape: circle

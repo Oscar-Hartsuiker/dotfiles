@@ -1,0 +1,263 @@
+# Personal Zsh configuration file. It is strongly recommended to keep all
+# shell customization and configuration (including exported environment
+# variables such as PATH) in this file or in files sourced from it.
+#
+# Documentation: https://github.com/romkatv/zsh4humans/blob/v5/README.md.
+
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}
+
+# Periodic auto-update on Zsh startup: 'ask' or 'no'.
+# You can manually run `z4h update` to update everything.
+zstyle ':z4h:' auto-update      'no'
+# Ask whether to auto-update this often; has no effect if auto-update is 'no'.
+zstyle ':z4h:' auto-update-days '28'
+
+# Keyboard type: 'mac' or 'pc'.
+zstyle ':z4h:bindkey' keyboard  'pc'
+
+# Don't start tmux.
+zstyle ':z4h:' start-tmux       no
+
+# Mark up shell's output with semantic information.
+zstyle ':z4h:' term-shell-integration 'yes'
+# Enable Vi command line editing
+# Right-arrow key accepts one character ('partial-accept') from
+# command autosuggestions or the whole thing ('accept')?
+zstyle ':z4h:autosuggestions' forward-char 'accept'
+
+# Recursively traverse directories when TAB-completing files.
+zstyle ':z4h:fzf-complete' recurse-dirs 'yes'
+
+# Enable direnv to automatically source .envrc files.
+zstyle ':z4h:direnv'         enable 'no'
+# Show "loading" and "unloading" notifications from direnv.
+zstyle ':z4h:direnv:success' notify 'yes'
+
+# Enable ('yes') or disable ('no') automatic teleportation of z4h over
+# SSH when connecting to these hosts.
+zstyle ':z4h:ssh:example-hostname1'   enable 'yes'
+zstyle ':z4h:ssh:*.example-hostname2' enable 'no'
+# The default value if none of the overrides above match the hostname.
+zstyle ':z4h:ssh:*'                   enable 'no'
+
+# Send these files over to the remote host when connecting over SSH to the
+# enabled hosts.
+zstyle ':z4h:ssh:*' send-extra-files '~/.nanorc' '~/.env.zsh'
+
+# Clone additional Git repositories from GitHub.
+#
+# This doesn't do anything apart from cloning the repository and keeping it
+# up-to-date. Cloned files can be used after `z4h init`. This is just an
+# example. If you don't plan to use Oh My Zsh, delete this line.
+z4h install ohmyzsh/ohmyzsh || return
+
+# Install or update core components (fzf, zsh-autosuggestions, etc.) and
+# initialize Zsh. After this point console I/O is unavailable until Zsh
+# is fully initialized. Everything that requires user interaction or can
+# perform network I/O must be done above. Everything else is best done below.
+z4h init || return
+
+# --- vi mode: must come right after z4h init ---
+#bindkey -v
+#bindkey '^I' z4h-fzf-complete
+#
+#function zle-keymap-select() {
+#  if [[ ${KEYMAP} == vicmd ]]; then
+##    echo -ne '\e[1q'
+#  else
+#    echo -ne '\e[5q'
+#  fi
+#}
+#zle -N zle-keymap-select
+#
+#function zle-line-init() { echo -ne '\e[5q' }
+#zle -N zle-line-init
+# --- end vi mode block ---
+
+
+# Extend PATH.
+path=(~/bin $path)
+
+# Export environment variables.
+export GPG_TTY=$TTY
+
+# Source additional local files if they exist.
+z4h source ~/.env.zsh
+
+# Use additional Git repositories pulled in with `z4h install`.
+#
+# This is just an example that you should delete. It does nothing useful.
+#z4h source ohmyzsh/ohmyzsh/lib/diagnostics.zsh  # source an individual file
+#z4h load   ohmyzsh/ohmyzsh/plugins/emoji-clock  # load a plugin
+
+# Define key bindings.
+#z4h bindkey z4h-backward-kill-word  Ctrl+Backspace     Ctrl+H
+z4h bindkey z4h-backward-kill-zword Ctrl+Alt+Backspace
+
+z4h bindkey undo Ctrl+/ Shift+Tab  # undo the last command line change
+z4h bindkey redo Alt+/             # redo the last undone command line change
+#Ctrl + Left/Right Arrow for word jumping
+#bindkey '^[[D' backward-word
+#bindkey '^[[C' forward-word
+
+# Ctrl + Backspace for deleting the previous word
+bindkey '^H' backward-delete-word
+z4h bindkey z4h-cd-back    Alt+Left   # cd into the previous directory
+z4h bindkey z4h-cd-forward Alt+Right  # cd into the next directory
+z4h bindkey z4h-cd-up      Alt+Up     # cd into the parent directory
+z4h bindkey z4h-cd-down    Alt+Down   # cd into a child directory
+
+# Autoload functions.
+autoload -Uz zmv
+
+# Define functions and completions.
+function md() { [[ $# == 1 ]] && mkdir -p -- "$1" && cd -- "$1" }
+compdef _directories md
+
+# Define aliases.
+alias tree='tree -a -I .git'
+# --- "I forgot the command" helpers ---
+alias h='history 1 | fzf'
+alias whatsize='du -sh'
+
+# --- disk / cleanup ---
+alias space='df -h'
+alias diskusage='ncdu'
+alias dux='du -sh * | sort -rh'          # sort current dir by size, biggest first
+alias cleanpac='sudo pacman -Sc'
+alias orphans='pacman -Qtdq'
+alias rmorphans='sudo pacman -Rns $(pacman -Qtdq)'
+
+# --- pacman / yay shortcuts ---
+alias update='yay -Syu'
+alias search='yay -Ss'                   # search AUR + repos
+alias installed='pacman -Qs'    #rch what's already installed
+
+# --- navigation ---
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ll='ls -lah'
+alias lt='ls -lahtr'        # sorted by most recently modified
+alias ...='cd ../..'
+# --- "I forgot the command" helpers ---
+alias h='history 1 | fzf'                # fuzzy-search your command history
+alias whatsize='du -sh'
+
+alias c="clear"
+#alias y="yazi"
+alias r="source ranger"
+#alias ls="lsd"
+#alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias m="mpd; rmpc"
+alias vi="nvim"
+alias v="nvim"
+alias nb="nvim /mnt/space/notebook/root.md"
+alias j="nvim -c \"lua require('config.journal').add_entry()\""
+#alias j="journal"
+alias drivefix="sudo ntfsfix -d /dev/sdxX"
+alias play='(mpv "$(find -type f | fzf)")'
+# PLACES
+alias hartsuiker-guitar-web="cd /mnt/space/OH-Gtrs/Marketing/hartsuiker-guitar-web/ ; ls"
+alias space="cd /mnt/space/ ; ls"
+alias media="/run/media/oscar/"
+### DOTFILES  ###
+
+alias dotgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias .kitty="~/.config/kitty"
+alias .zrc="nvim ~/.zshrc"
+##### HYPRLAND
+alias .hypr="~/.config/hypr/"
+alias .rofi="~/.config/rofi/"
+# Add flags to existing aliases.
+alias ls="${aliases[ls]:-ls} -A"
+alias .hyprset="nvim  ~/.config/hypr/* ~/.config/waybar/* ~/.config/rofi/*"
+
+
+alias synaptic="sudo -sE synaptic"
+
+# Pacman aliases
+alias pacupdate='sudo pacman -Syu'                     # full system update
+alias pacsearch='pacman -Ss'                            # search repos
+alias pacinstall='sudo pacman -S'                        # install package
+alias pacremove='sudo pacman -Rns'                       # remove package + deps + configs
+alias pacinfo='pacman -Qi'                                # info on installed package
+alias pacinfoall='pacman -Si'                             # info on repo package
+alias paclist='pacman -Qe'                                # list explicitly installed packages
+alias pacorphan='pacman -Qtdq'                            # list orphaned packages
+alias pacclean='sudo pacman -Rns $(pacman -Qtdq)'         # remove orphans
+alias paccache='sudo pacman -Sc'                          # clean package cache (keep installed versions)
+alias paccacheall='sudo pacman -Scc'                      # clean ALL cached packages
+alias pacfiles='pacman -Qo'                               # which package owns a file
+alias pacdeps='pacman -Qi'                                 # (same as pacinfo, shows deps)
+alias pacsize='pacman -Qi | grep -E "Name|Installed Size"' # rough package size listing
+# AUR helper (yay example)
+alias yayupdate='yay -Syu'
+alias yaysearch='yay -Ss'
+alias yayinstall='yay -S'
+alias yayclean='yay -Yc'   # clean unneeded deps
+alias pacmirror='sudo reflector --country "South Africa,Germany,Netherlands" --age 24 --protocol https --sort rate --save /etc/pacman.d/mirrorlist'
+# Set shell options: http://zsh.sourceforge.net/Doc/Release/Options.html.
+setopt glob_dots     # no special treatment for file names with a leading dot
+#setopt no_auto_menu  # require an extra TAB press to open the completion menu
+
+alias sm="swayimg"
+
+# Remove or update your old path if you had: ~/.emacs.d/bin
+export PATH="$PATH:/opt/nvim/bin"
+export EDITOR='nvim'
+export PATH="$PATH:/opt/nvim/bin"
+export PATH=$HOME/.config/rofi/bin:$PATH
+# Edit .zshrc and add this line
+export PATH=$HOME/.config/rofi/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+ytdf() {
+  local fmt
+  fmt=$(yt-dlp -F "$1" | fzf --header-lines=3 --reverse | awk '{print $1}')
+  [ -n "$fmt" ] && yt-dlp -f "${fmt}+bestaudio/best" \
+    -o "%(title)s.%(ext)s" \
+    --restrict-filenames \
+    --no-playlist \
+    "$1"
+}
+
+globalias() {
+  if [[ $LBUFFER =~ '[a-zA-Z0-9]+$' ]]; then
+    zle _expand_alias
+    zle expand-word
+  fi
+  zle self-insert
+}
+zle -N globalias
+bindkey " " globalias
+bindkey "^ " magic-space 
+
+
+# Force yay search to output clickable URLs
+yay() {
+    if [[ "$1" == "-Ss" || "$1" == "search" ]]; then
+        command yay "$@" | sed -E 's|((aur\|archlinux)\.org/)|https://\1|g'
+    else
+        command yay "$@"
+    fi
+}
+
+
+
+
+
+
+# opencode
+export PATH=/home/oscar/.opencode/bin:$PATH

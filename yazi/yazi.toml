@@ -1,0 +1,13 @@
+[preview]
+# Change them to your desired values
+max_width  = 8000
+max_height = 2000
+
+
+[mgr]
+# Default is [1, 4, 3]
+# This gives the preview pane (3rd number) more space:
+ratio = [4, 7, 6]
+
+[ui]
+border = "none"

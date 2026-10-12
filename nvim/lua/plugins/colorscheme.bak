@@ -1,0 +1,83 @@
+return {
+  {
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
+    opts = {
+      terminal_colors = true,
+      undercurl = true,
+      underline = true,
+      bold = true,
+      italic = {
+        strings = true,
+        emphasis = true,
+        comments = true,
+        operators = false,
+        folds = true,
+      },
+      strikethrough = true,
+      invert_selection = false,
+      invert_signs = false,
+      invert_tabline = false,
+      inverse = true,
+      contrast = "",
+      palette_overrides = {},
+      overrides = {},
+      dim_inactive = false,
+      transparent_mode = false,
+    },
+    config = function(_, opts)
+      require("gruvbox").setup(opts)
+      vim.cmd("colorscheme gruvbox")
+
+      local state_file = os.getenv("HOME") .. "/.cache/theme-mode-gruvbox"
+      local last_mtime = 0
+
+      local function reload_gruvbox()
+        local file = io.open(state_file, "r")
+        if file then
+          local mode = file:read("*line")
+          file:close()
+          if mode then
+            mode = mode:gsub("%s+", "")
+            if mode == "dark" then
+              vim.o.background = "dark"
+            elseif mode == "light" then
+              vim.o.background = "light"
+            else
+              return
+            end
+          end
+        else
+          vim.o.background = "dark"
+        end
+        vim.cmd("colorscheme gruvbox")
+      end
+
+      reload_gruvbox() -- initial load
+
+      -- Poll every 2 seconds (safe, no watcher)
+      local timer = vim.loop.new_timer()
+      timer:start(
+        1000,
+        2000,
+        vim.schedule_wrap(function()
+          local attr = vim.loop.fs_stat(state_file)
+          if attr then
+            local mtime = attr.mtime.sec
+            if mtime ~= last_mtime then
+              last_mtime = mtime
+              reload_gruvbox()
+            end
+          end
+        end)
+      )
+      _G._theme_timer = timer -- keep alive
+    end,
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "gruvbox",
+    },
+  },
+}
