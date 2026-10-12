@@ -1,8 +1,8 @@
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 local programs = {
-	terminal = "alacritty",
-	terminal2 = "ghostty",
+	terminal2 = "alacritty",
+	terminal = "ghostty",
 	--fileManager = "nautilus --new-window",
 	fileManager = "dolphin",
 	menu = "rofi -show combi -combi-modi window,drun,run,fileManage",
