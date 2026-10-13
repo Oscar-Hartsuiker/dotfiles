@@ -4,7 +4,7 @@
 (
     address: "127.0.0.1:6600",
     password: None,
-    theme: None,
+    theme: Some("square"),
     cache_dir: None,
     on_song_change: None,
     volume_step: 5,
@@ -158,7 +158,7 @@
                                 (
                                     size: "3",
                                     borders: "ALL",
-                                    border_symbols: Inherited(parent: Rounded, bottom_left: "├", bottom_right: "┤",),
+                                    border_symbols: Inherited(parent: Plain, bottom_left: "├", bottom_right: "┤",),
                                     pane: Split(
                                         direction: Horizontal,
                                         panes: [
@@ -176,7 +176,7 @@
                                 (
                                     size: "100%",
                                     borders: "LEFT | RIGHT | BOTTOM",
-                                    border_symbols: Rounded,
+                                    border_symbols: Plain,
                                     pane: Split(
                                         direction: Horizontal,
                                         panes: [
@@ -203,7 +203,7 @@
                                 (
                                     size: "100%",
                                     borders: "LEFT | RIGHT | TOP | BOTTOM",
-                                    border_symbols: Rounded,
+                                    border_symbols: Plain,
                                     pane: Pane(AlbumArt)
                                 ),
                             ],
@@ -215,61 +215,61 @@
         (
             name: "Directories",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(Directories), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(Directories), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
         (
             name: "Artists",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(Artists), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(Artists), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
         (
             name: "Album Artists",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(AlbumArtists), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(AlbumArtists), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
         (
             name: "Albums",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(Albums), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(Albums), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
         (
             name: "Playlists",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(Playlists), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(Playlists), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
         (
             name: "Search",
             borders: "ALL",
-            border_symbols: Rounded,
+            border_symbols: Plain,
             pane: Split(
                 size: "100%",
                 direction: Vertical,
-                panes: [(pane: Pane(Search), size: "100%", borders: "ALL", border_symbols: Rounded)],
+                panes: [(pane: Pane(Search), size: "100%", borders: "ALL", border_symbols: Plain)],
             )
         ),
     ],
