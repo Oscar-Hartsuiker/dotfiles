@@ -4,6 +4,7 @@ require("window-binds")
 require("dms-theme-sync")
 require("gestures")
 require("titlebars")
+--require("hyprexpo")
 hl.config({
 	group = {
 		groupbar = {
