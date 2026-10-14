@@ -48,6 +48,16 @@ hl.config({
 			offset = "0 5",
 			color = "rgba(00000070)",
 		},
+		blur = {
+			enabled = false,
+			size = 3,
+			passes = 2,
+			brightness = 1.0,
+			contrast = 0.8916,
+			noise = 0.0117,
+			ignore_opacity = true,
+			new_optimizations = true,
+		},
 	},
 	misc = {
 		disable_hyprland_logo = true,

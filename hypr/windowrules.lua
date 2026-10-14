@@ -54,8 +54,8 @@ hl.config({
 
 hl.config({
 	misc = {
-		force_default_wallpaper = 1, -- Set to 0 or 1 to disable the anime mascot wallpapers
-		disable_hyprland_logo = true, -- If true disables the random hyprland logo / anime girl background. :(
+		force_default_wallpaper = 2, -- Set to 0 or 1 to disable the anime mascot wallpapers
+		disable_hyprland_logo = false, -- If true disables the random hyprland logo / anime girl background. :(
 	},
 })
 
@@ -66,9 +66,10 @@ hl.config({
 --hl.workspace_rule({ workspace = "special:󰟠", gaps_out = 0, gaps_in = 0 })
 hl.window_rule({
 	match = { workspace = "special:󰟠" },
-	float = true,
+	--float = true,
 	size = { 1000, 700 },
-	rounding = 8,
+	opacity = 0.8,
+	--rounding = 8,
 })
 --hl.workspace_rule({ workspace = "4", layout = "scrolling" })
 -- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
