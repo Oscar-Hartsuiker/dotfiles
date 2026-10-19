@@ -1,0 +1,677 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
+
+FloatingWindow {
+    id: win
+    title: "Forecast"
+    implicitWidth: 860
+    implicitHeight: 960
+    color: c("background", "#0e1220")
+
+    property var dWind: null
+    property var dSwell: null
+    property var dTide: null
+
+    property var dms: null
+    property string dmsRaw: ""
+    function c(name, fallback) {
+        var m = dms && dms.colors
+        var set = m ? (m[dms.mode] || m.dark) : null
+        return set && set[name] ? set[name] : fallback
+    }
+    function withAlpha(hex, a) {
+        var h = String(hex).replace("#", "")
+        if (h.length === 6) h += "ff"
+        var n = parseInt(h, 16)
+        return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
+    }
+
+    IpcHandler { target: "toggle"; function toggle(): void { win.visible = !win.visible } }
+    IpcHandler { target: "show";   function show(): void { win.visible = true } }
+    IpcHandler { target: "hide";   function hide(): void { win.visible = false } }
+
+    FileView {
+        id: dmsColors
+        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache") + "/DankMaterialShell/dms-colors.json"
+        watchChanges: false
+        blockLoading: false
+        onFileChanged: win.loadDms()
+        onLoadFailed: console.log("forecast: dms-colors.json missing, using fallback colours")
+    }
+    Timer {
+        interval: 1500; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: { dmsColors.reload(); dmsApply.start() }
+    }
+    Timer { id: dmsApply; interval: 80; onTriggered: win.loadDms() }
+
+    function loadDms() {
+        var t = dmsColors.text()
+        if (!t || t === dmsRaw) return
+        try {
+            dmsRaw = t
+            dms = JSON.parse(t)
+        } catch (e) { console.log("forecast: bad dms colours:", e) }
+    }
+
+    property bool rtl: false
+    property int dayOffset: 0
+    property double lastShift: 0
+
+    Process {
+        id: windProc
+        command: ["python3", Quickshell.shellDir + "/wind.py", String(win.dayOffset)]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try { win.dWind = JSON.parse(text) } catch (e) { console.log("wind.py output:", text) }
+            }
+        }
+    }
+    Process {
+        id: swellProc
+        command: ["python3", Quickshell.shellDir + "/swell.py", String(win.dayOffset)]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try { win.dSwell = JSON.parse(text) } catch (e) { console.log("swell.py output:", text) }
+            }
+        }
+    }
+    Process {
+        id: tideProc
+        command: ["python3", Quickshell.shellDir + "/tide.py", String(win.dayOffset)]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try { win.dTide = JSON.parse(text) } catch (e) { console.log("tide.py output:", text) }
+            }
+        }
+    }
+
+    Timer {
+        interval: 60000; running: true; repeat: true
+        onTriggered: { windProc.running = true; swellProc.running = true; tideProc.running = true }
+    }
+    Timer {
+        id: restart; interval: 30
+        onTriggered: { windProc.running = true; swellProc.running = true; tideProc.running = true }
+    }
+
+    function shift(n) {
+        var o = Math.max(0, Math.min(9, dayOffset + n))
+        if (o === dayOffset) return
+        dayOffset = o
+        windProc.running = false
+        swellProc.running = false
+        tideProc.running = false
+        restart.start()
+    }
+    function today() {
+        if (dayOffset === 0) return
+        dayOffset = 0
+        windProc.running = false
+        swellProc.running = false
+        tideProc.running = false
+        restart.start()
+    }
+
+    readonly property var compass: ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    function compassOf(deg) { return compass[Math.round(deg / 22.5) % 16] }
+
+    function mainData() {
+        return dWind || dSwell || dTide
+    }
+
+    function idxNow(D) {
+        if (!D || !D.dirs.length) return -1
+        var h = (D.now >= 0 && D.now <= 24) ? Math.round(D.now) : 12
+        var best = 0
+        for (var i = 0; i < D.dirs.length; i++)
+            if (Math.abs(D.dirs[i][0] - h) < Math.abs(D.dirs[best][0] - h)) best = i
+        return best
+    }
+    function dirText(D) {
+        var i = idxNow(D)
+        if (i < 0) return "--"
+        var deg = D.dirs[i][1]
+        return compassOf(deg) + "  " + deg + "°"
+    }
+    function periodText(D) {
+        var i = idxNow(D)
+        if (i < 0) return "--"
+        var p = (win.dayOffset === 0 && D.period) ? D.period : D.periods[i][1]
+        return p.toFixed(0) + " s"
+    }
+
+    function nextTide(D, type) {
+        if (!D) return null
+        var from = (D.now >= 0 && D.now <= 24) ? D.now : 0
+        for (var i = 0; i < D.extrema.length; i++)
+            if (D.extrema[i].type === type && D.extrema[i].h > from) return D.extrema[i]
+        return null
+    }
+    function fmtTide(e) { return e ? e.time + "  " + e.v.toFixed(2) + " m" : "--" }
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 16
+        spacing: 10
+        focus: true
+
+        Keys.onLeftPressed: win.shift(-1)
+        Keys.onRightPressed: win.shift(1)
+        Keys.onPressed: (e) => { if (e.key === Qt.Key_Home) win.today() }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 28
+
+            ColumnLayout {
+                spacing: 0
+                Text {
+                    text: "FORECAST"; color: win.c("primary", "#19b5e6")
+                    font.pixelSize: 11; font.letterSpacing: 2; font.bold: true
+                }
+                Text {
+                    text: win.mainData() ? win.mainData().station : "--"
+                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true
+                }
+            }
+            ColumnLayout {
+                spacing: 0
+                Text {
+                    text: "DATE"; color: win.c("on_surface_variant", "#7f8bb3")
+                    font.pixelSize: 11; font.letterSpacing: 1.5
+                }
+                Text {
+                    text: win.mainData()
+                        ? win.mainData().label + (win.dayOffset === 0 ? "  · today" : "")
+                        : "--"
+                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true
+                }
+            }
+            Item { Layout.fillWidth: true }
+            Text {
+                text: "← → / scroll  ·  Home = today"
+                color: win.c("on_surface_variant", "#7f8bb3")
+                font.pixelSize: 11
+            }
+        }
+
+        // ── wind ──────────────────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 4
+
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    text: "WIND"; Layout.preferredWidth: 76
+                    color: win.c("primary", "#19b5e6")
+                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                }
+                Repeater {
+                    model: win.dWind ? [
+                        { k: win.dayOffset === 0 ? "NOW" : "AVG",
+                          v: (win.dayOffset === 0 ? win.dWind.current.toFixed(1)
+                              : (win.dWind.points.reduce(function (a, p) { return a + p[1] }, 0) / win.dWind.points.length).toFixed(1))
+                             + " kn" + (win.dayOffset === 0 ? (win.dWind.rising ? " ▲" : " ▼") : "") },
+                        { k: "FROM", v: win.dirText(win.dWind) },
+                        { k: "MAX GUST", v: win.dWind.max_gust.time + "  " + win.dWind.max_gust.v.toFixed(1) + " kn" }
+                    ] : []
+                    delegate: ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                    }
+                }
+            }
+
+            Canvas {
+                id: windCv
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Connections { target: win; function onDWindChanged() { windCv.requestPaint() } }
+                Connections { target: win; function onDmsChanged() { windCv.requestPaint() } }
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+
+                WheelHandler {
+                    onWheel: (e) => {
+                        if (Date.now() - win.lastShift < 120) return
+                        win.lastShift = Date.now()
+                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
+                    }
+                }
+                TapHandler { onDoubleTapped: win.today() }
+
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.reset()
+                    var D = win.dWind
+                    if (!D) return
+
+                    var L = 44, R = 44, T = 26, B = 8
+                    var pw = width - L - R, ph = height - T - B
+                    var maxV = Math.max.apply(null, D.gusts.map(function (p) { return p[1] }))
+                    var lo = 0
+                    var hi = Math.max(10, Math.ceil((maxV + 2) / 5) * 5)
+                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
+
+                    var colAccent = win.c("primary", "#19b5e6")
+                    var colGust = win.c("tertiary", "#e6a419")
+                    var colOnSurface = win.c("on_surface", "#c8c6ce")
+                    var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
+                    var colSurface = win.c("surface_container", "#121318")
+
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
+                    ctx.fillRect(L, T, pw, ph)
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
+                    D.nights.forEach(function (n) {
+                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        if (b <= a) return
+                        var x1 = X(a), x2 = X(b)
+                        ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
+                    })
+
+                    ctx.font = "12px monospace"
+                    ctx.textAlign = "center"
+                    ctx.lineWidth = 1
+                    for (var h = 0; h <= 24; h += 2) {
+                        var gx = X(h), hh = h % 24
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
+                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
+                    }
+
+                    ctx.textAlign = "right"
+                    for (var k = 0; k <= hi; k += 5) {
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.25)
+                        ctx.beginPath(); ctx.moveTo(L, Y(k)); ctx.lineTo(L + pw, Y(k)); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText(k + " kn", L - 6, Y(k) + 4)
+                    }
+
+                    function mkPts(arr) { return arr.map(function (p) { return { x: X(p[0]), y: Y(p[1]) } }) }
+                    function trace(pts) {
+                        ctx.moveTo(pts[0].x, pts[0].y)
+                        for (var i = 0; i < pts.length - 1; i++) {
+                            var p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1]
+                            var p3 = pts[Math.min(i + 2, pts.length - 1)]
+                            ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+                                              p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+                                              p2.x, p2.y)
+                        }
+                    }
+                    var sp = mkPts(D.points), gp = mkPts(D.gusts)
+
+                    ctx.save()
+                    ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
+
+                    ctx.beginPath(); trace(gp)
+                    ctx.setLineDash([6, 5])
+                    ctx.lineJoin = "round"; ctx.lineCap = "round"
+                    ctx.strokeStyle = colGust; ctx.lineWidth = 2; ctx.stroke()
+                    ctx.setLineDash([])
+
+                    ctx.beginPath(); trace(sp)
+                    ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
+                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.beginPath(); trace(sp)
+                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                    ctx.restore()
+
+                    D.dirs.forEach(function (e, i) {
+                        if (e[0] % 2 !== 0 || e[0] > 24) return
+                        var p = sp[i]
+                        if (!p) return
+                        ctx.save()
+                        ctx.translate(p.x, p.y)
+                        ctx.rotate((e[1] + 180) * Math.PI / 180)
+                        ctx.beginPath()
+                        ctx.moveTo(0, -10); ctx.lineTo(6, 6); ctx.lineTo(0, 3); ctx.lineTo(-6, 6); ctx.closePath()
+                        ctx.fillStyle = colOnSurface
+                        ctx.strokeStyle = win.withAlpha(colSurface, 0.9); ctx.lineWidth = 2
+                        ctx.stroke(); ctx.fill()
+                        ctx.restore()
+                    })
+
+                    if (D.now >= 0 && D.now <= 24) {
+                        var nx = X(D.now), ny = Y(D.current)
+                        ctx.strokeStyle = win.withAlpha(colOnSurface, 0.7); ctx.lineWidth = 1
+                        ctx.beginPath(); ctx.moveTo(nx, T); ctx.lineTo(nx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colAccent; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
+                        ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+                    }
+
+                    ctx.font = "11px monospace"; ctx.textAlign = "right"
+                    ctx.fillStyle = colAccent; ctx.fillText("— wind", L + pw - 70, T + 14)
+                    ctx.fillStyle = colGust;   ctx.fillText("- - gust", L + pw - 6, T + 14)
+                }
+            }
+        }
+
+        // ── swell ─────────────────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 4
+
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    text: "SWELL"; Layout.preferredWidth: 76
+                    color: win.c("primary", "#19b5e6")
+                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                }
+                Repeater {
+                    model: win.dSwell ? [
+                        { k: win.dayOffset === 0 ? "NOW" : "AVG",
+                          v: (win.dayOffset === 0 ? win.dSwell.current.toFixed(2)
+                              : (win.dSwell.points.reduce(function (a, p) { return a + p[1] }, 0) / win.dSwell.points.length).toFixed(2))
+                             + " m" + (win.dayOffset === 0 ? (win.dSwell.rising ? " ▲" : " ▼") : "") },
+                        { k: "PERIOD", v: win.periodText(win.dSwell) },
+                        { k: "FROM", v: win.dirText(win.dSwell) },
+                        { k: "PEAK", v: win.dSwell.peak.time + "  " + win.dSwell.peak.v.toFixed(2) + " m" }
+                    ] : []
+                    delegate: ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                    }
+                }
+            }
+
+            Canvas {
+                id: swellCv
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Connections { target: win; function onDSwellChanged() { swellCv.requestPaint() } }
+                Connections { target: win; function onDmsChanged() { swellCv.requestPaint() } }
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+
+                WheelHandler {
+                    onWheel: (e) => {
+                        if (Date.now() - win.lastShift < 120) return
+                        win.lastShift = Date.now()
+                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
+                    }
+                }
+                TapHandler { onDoubleTapped: win.today() }
+
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.reset()
+                    var D = win.dSwell
+                    if (!D) return
+
+                    var L = 44, R = 44, T = 26, B = 8
+                    var pw = width - L - R, ph = height - T - B
+
+                    var maxV = Math.max.apply(null, D.points.map(function (p) { return p[1] }))
+                    var step = maxV > 3 ? 1 : 0.5
+                    var lo = 0
+                    var hi = Math.max(1, Math.ceil((maxV + 0.3) / step) * step)
+
+                    var pv = D.periods.map(function (p) { return p[1] })
+                    var pLo = Math.max(0, Math.floor((Math.min.apply(null, pv) - 2) / 2) * 2)
+                    var pHi = Math.ceil((Math.max.apply(null, pv) + 2) / 2) * 2
+
+                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
+                    function Yp(v) { return T + (1 - (v - pLo) / (pHi - pLo)) * ph }
+
+                    var colAccent = win.c("primary", "#19b5e6")
+                    var colPeriod = win.c("tertiary", "#e6a419")
+                    var colOnSurface = win.c("on_surface", "#c8c6ce")
+                    var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
+                    var colSurface = win.c("surface_container", "#121318")
+
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
+                    ctx.fillRect(L, T, pw, ph)
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
+                    D.nights.forEach(function (n) {
+                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        if (b <= a) return
+                        var x1 = X(a), x2 = X(b)
+                        ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
+                    })
+
+                    ctx.font = "12px monospace"
+                    ctx.textAlign = "center"
+                    ctx.lineWidth = 1
+                    for (var h = 0; h <= 24; h += 2) {
+                        var gx = X(h), hh = h % 24
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
+                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
+                    }
+
+                    ctx.textAlign = "right"
+                    for (var k = 0; k <= hi + 0.001; k += step) {
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.25)
+                        ctx.beginPath(); ctx.moveTo(L, Y(k)); ctx.lineTo(L + pw, Y(k)); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText(k.toFixed(step < 1 ? 1 : 0) + " m", L - 6, Y(k) + 4)
+                    }
+
+                    ctx.textAlign = "left"
+                    ctx.fillStyle = colPeriod
+                    for (var s = pLo; s <= pHi; s += 2)
+                        ctx.fillText(s + " s", L + pw + 6, Yp(s) + 4)
+
+                    function mk(arr, fy) { return arr.map(function (p) { return { x: X(p[0]), y: fy(p[1]) } }) }
+                    function trace(pts) {
+                        ctx.moveTo(pts[0].x, pts[0].y)
+                        for (var i = 0; i < pts.length - 1; i++) {
+                            var p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1]
+                            var p3 = pts[Math.min(i + 2, pts.length - 1)]
+                            ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+                                              p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+                                              p2.x, p2.y)
+                        }
+                    }
+                    var sp = mk(D.points, Y)
+                    var pp = mk(D.periods, Yp)
+
+                    ctx.save()
+                    ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
+
+                    ctx.beginPath(); trace(sp)
+                    ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
+                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.beginPath(); trace(sp)
+                    ctx.lineJoin = "round"; ctx.lineCap = "round"
+                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+
+                    ctx.beginPath(); trace(pp)
+                    ctx.setLineDash([6, 5])
+                    ctx.strokeStyle = colPeriod; ctx.lineWidth = 2; ctx.stroke()
+                    ctx.setLineDash([])
+                    ctx.restore()
+
+                    ctx.font = "bold 11px monospace"; ctx.textAlign = "center"
+                    D.periods.forEach(function (e, i) {
+                        if (e[0] % 2 !== 0 || !pp[i]) return
+                        ctx.fillStyle = colPeriod
+                        ctx.fillText(e[1].toFixed(0) + "s", pp[i].x, Math.max(T + 12, pp[i].y - 8))
+                    })
+
+                    D.dirs.forEach(function (e, i) {
+                        if (e[0] % 2 !== 0 || !sp[i]) return
+                        ctx.save()
+                        ctx.translate(sp[i].x, sp[i].y)
+                        ctx.rotate((e[1] + 180) * Math.PI / 180)
+                        ctx.beginPath()
+                        ctx.moveTo(0, -10); ctx.lineTo(6, 6); ctx.lineTo(0, 3); ctx.lineTo(-6, 6); ctx.closePath()
+                        ctx.fillStyle = colOnSurface
+                        ctx.strokeStyle = win.withAlpha(colSurface, 0.9); ctx.lineWidth = 2
+                        ctx.stroke(); ctx.fill()
+                        ctx.restore()
+                    })
+
+                    if (D.now >= 0 && D.now <= 24) {
+                        var nx = X(D.now), ny = Y(D.current)
+                        ctx.strokeStyle = win.withAlpha(colOnSurface, 0.7); ctx.lineWidth = 1
+                        ctx.beginPath(); ctx.moveTo(nx, T); ctx.lineTo(nx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colAccent; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
+                        ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+                    }
+
+                    ctx.font = "11px monospace"; ctx.textAlign = "right"
+                    ctx.fillStyle = colAccent; ctx.fillText("— height", L + pw - 76, T + 14)
+                    ctx.fillStyle = colPeriod; ctx.fillText("- - period", L + pw - 6, T + 14)
+                }
+            }
+        }
+
+        // ── tide ──────────────────────────────────────────────────────────────
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 4
+
+            RowLayout {
+                Layout.fillWidth: true
+                Text {
+                    text: "TIDE"; Layout.preferredWidth: 76
+                    color: win.c("primary", "#19b5e6")
+                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                }
+                Repeater {
+                    model: win.dTide ? [
+                        { k: "NOW",
+                          v: win.dTide.current.toFixed(2) + " m " + (win.dTide.rising ? "▲" : "▼") },
+                        { k: win.dayOffset === 0 ? "NEXT HIGH" : "HIGH", v: win.fmtTide(win.nextTide(win.dTide, "high")) },
+                        { k: win.dayOffset === 0 ? "NEXT LOW"  : "LOW",  v: win.fmtTide(win.nextTide(win.dTide, "low")) }
+                    ] : []
+                    delegate: ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                    }
+                }
+            }
+
+            Canvas {
+                id: tideCv
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Connections { target: win; function onDTideChanged() { tideCv.requestPaint() } }
+                Connections { target: win; function onDmsChanged() { tideCv.requestPaint() } }
+                onWidthChanged: requestPaint()
+                onHeightChanged: requestPaint()
+
+                WheelHandler {
+                    onWheel: (e) => {
+                        if (Date.now() - win.lastShift < 120) return
+                        win.lastShift = Date.now()
+                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
+                    }
+                }
+                TapHandler { onDoubleTapped: win.today() }
+
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.reset()
+                    var D = win.dTide
+                    if (!D) return
+
+                    var L = 44, R = 44, T = 26, B = 8
+                    var pw = width - L - R, ph = height - T - B
+                    var vs = D.points.map(function (p) { return p[1] })
+                    var lo = Math.min.apply(null, vs) - 0.15
+                    var hi = Math.max.apply(null, vs) + 0.15
+                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
+
+                    var colAccent = win.c("primary", "#19b5e6")
+                    var colOnSurface = win.c("on_surface", "#c8c6ce")
+                    var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
+                    var colSurface = win.c("surface_container", "#121318")
+
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
+                    ctx.fillRect(L, T, pw, ph)
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
+                    D.nights.forEach(function (n) {
+                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        if (b <= a) return
+                        var x1 = X(a), x2 = X(b)
+                        ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
+                    })
+
+                    ctx.font = "12px monospace"
+                    ctx.textAlign = "center"
+                    ctx.lineWidth = 1
+                    for (var h = 0; h <= 24; h += 2) {
+                        var gx = X(h), hh = h % 24
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
+                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
+                    }
+
+                    ctx.textAlign = "right"
+                    for (var m = Math.ceil(lo); m <= hi; m++) {
+                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.25)
+                        ctx.beginPath(); ctx.moveTo(L, Y(m)); ctx.lineTo(L + pw, Y(m)); ctx.stroke()
+                        ctx.fillStyle = colOnSurfaceVar
+                        ctx.fillText(m + " m", L - 6, Y(m) + 4)
+                    }
+
+                    var pts = D.points.map(function (p) { return { x: X(p[0]), y: Y(p[1]) } })
+                    function trace() {
+                        ctx.moveTo(pts[0].x, pts[0].y)
+                        for (var i = 0; i < pts.length - 1; i++) {
+                            var p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1]
+                            var p3 = pts[Math.min(i + 2, pts.length - 1)]
+                            ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+                                              p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+                                              p2.x, p2.y)
+                        }
+                    }
+                    ctx.save()
+                    ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
+                    ctx.beginPath(); trace()
+                    ctx.lineTo(pts[pts.length - 1].x, T + ph); ctx.lineTo(pts[0].x, T + ph); ctx.closePath()
+                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.beginPath(); trace()
+                    ctx.lineJoin = "round"; ctx.lineCap = "round"
+                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                    ctx.restore()
+
+                    if (D.now >= 0 && D.now <= 24) {
+                        var nx = X(D.now), ny = Y(D.current)
+                        ctx.strokeStyle = win.withAlpha(colOnSurface, 0.7); ctx.lineWidth = 1
+                        ctx.beginPath(); ctx.moveTo(nx, T); ctx.lineTo(nx, T + ph); ctx.stroke()
+                        ctx.fillStyle = colAccent; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
+                        ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
+                    }
+
+                    D.extrema.forEach(function (e) {
+                        if (e.h < 0 || e.h > 24) return
+                        var ex = X(e.h), ey = Y(e.v)
+                        ctx.fillStyle = colAccent
+                        ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI * 2); ctx.fill()
+                        var t = (e.type === "high" ? "H " : "L ") + e.time + "  " + e.v.toFixed(2) + "m"
+                        ctx.font = "12px monospace"; ctx.textAlign = "center"
+                        var w = ctx.measureText(t).width + 12
+                        var bx = Math.max(L + w / 2, Math.min(L + pw - w / 2, ex))
+                        var by = e.type === "high" ? ey - 30 : ey + 12
+                        ctx.fillStyle = win.withAlpha(colSurface, 0.9)
+                        ctx.fillRect(bx - w / 2, by, w, 20)
+                        ctx.fillStyle = colOnSurface
+                        ctx.fillText(t, bx, by + 14)
+                    })
+                }
+            }
+        }
+    }
+}

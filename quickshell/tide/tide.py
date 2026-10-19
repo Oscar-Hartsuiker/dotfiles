@@ -13,7 +13,7 @@ MAX_AGE = 3 * 3600
 
 
 def fetch():
-    q = f"latitude={LAT}&longitude={LON}&timezone={TZ}&past_days=3&forecast_days=7"
+    q = f"latitude={LAT}&longitude={LON}&timezone={TZ}&forecast_days=11"
 
     def get(url):
         with urllib.request.urlopen(url, timeout=15) as r:
@@ -124,9 +124,9 @@ for i in range(1, len(F) - 1):
         )
 
 sun = data["sun"]
-rises = [hrs(P(x)) for x in sun["sunrise"]]
-sets = [hrs(P(x)) for x in sun["sunset"]]
-nights = [[sets[i], rises[i + 1]] for i in range(len(sets) - 1)]
+rise = hrs(P(sun["sunrise"][offset]))
+sset = hrs(P(sun["sunset"][offset]))
+nights = [[0, rise], [sset, 24]]
 
 print(
     json.dumps(

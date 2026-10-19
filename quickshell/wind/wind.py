@@ -19,8 +19,7 @@ URL = "https://api.open-meteo.com/v1/gfs?" + urllib.parse.urlencode(
         "hourly": "wind_speed_10m,wind_direction_10m,wind_gusts_10m",
         "wind_speed_unit": "kn",
         "timezone": "Africa/Johannesburg",
-        "past_days": 2,
-        "forecast_days": 7,
+        "forecast_days": 11,
     }
 )
 

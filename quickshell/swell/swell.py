@@ -19,8 +19,7 @@ URL = "https://marine-api.open-meteo.com/v1/marine?" + urllib.parse.urlencode(
         "hourly": "wave_height,wave_direction,wave_period",
         "models": "ncep_gfswave025",
         "timezone": "Africa/Johannesburg",
-        "past_days": 2,
-        "forecast_days": 7,
+        "forecast_days": 11,
     }
 )
 

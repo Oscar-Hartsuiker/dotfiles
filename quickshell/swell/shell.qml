@@ -72,7 +72,7 @@ FloatingWindow {
     Timer { id: restart; interval: 30; onTriggered: proc.running = true }
 
     function shift(n) {
-        var o = Math.max(-2, Math.min(5, dayOffset + n))
+        var o = Math.max(0, Math.min(9, dayOffset + n))
         if (o === dayOffset) return
         dayOffset = o
         proc.running = false
