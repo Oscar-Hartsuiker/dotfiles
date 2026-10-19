@@ -8,9 +8,83 @@ FloatingWindow {
     title: "Tide"
     implicitWidth: 860
     implicitHeight: 460
-    color: "#0e1220"
+    color: c("background", "#0e1220")
 
     property var d: null
+
+    // dms (matugen) colours, live-updated from ~/.cache/DankMaterialShell/dms-colors.json
+    property var dms: null
+    function c(name, fallback) {
+        var m = dms && dms.colors
+        var set = m ? (m[dms.mode] || m.dark) : null
+        return set && set[name] ? set[name] : fallback
+    }
+    function withAlpha(hex, a) {
+        var h = String(hex).replace("#", "")
+        if (h.length === 6) h += "ff"
+        var n = parseInt(h, 16)
+        return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
+    }
+
+    IpcHandler {
+        target: "toggle"
+        function toggle(): void { win.visible = !win.visible }
+    }
+    IpcHandler {
+        target: "show"
+        function show(): void { win.visible = true }
+    }
+    IpcHandler {
+        target: "hide"
+        function hide(): void { win.visible = false }
+    }
+
+    IpcHandler {
+        target: "dump"
+        function dump(): void {
+            console.log("TIDEDUMP mode=" + (dms ? dms.mode : "none")
+                        + " bg=" + win.c("background", "?")
+                        + " primary=" + win.c("primary", "?")
+                        + " onSurface=" + win.c("on_surface", "?"))
+        }
+    }
+
+    property string dmsRaw: ""
+
+    FileView {
+        id: dmsColors
+        path: (Quickshell.env("XDG_CACHE_HOME") || Quickshell.env("HOME") + "/.cache") + "/DankMaterialShell/dms-colors.json"
+        watchChanges: false
+        blockLoading: false
+        onFileChanged: { win.loadDms() }
+        onLoadFailed: console.log("tide: dms-colors.json missing, using fallback colours")
+    }
+
+    // dms rewrites this file whenever matugen regenerates the wallpaper palette;
+    // poll it so tide follows theme/light-dark changes live.
+    Timer {
+        interval: 1500
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: { dmsColors.reload(); dmsApply.start() }
+    }
+
+    Timer {
+        id: dmsApply
+        interval: 80
+        onTriggered: win.loadDms()
+    }
+
+    function loadDms() {
+        var t = dmsColors.text()
+        if (!t || t === dmsRaw) return
+        try {
+            dmsRaw = t
+            dms = JSON.parse(t)
+            if (cv) cv.requestPaint()
+        } catch (e) { console.log("tide: bad dms colours:", e) }
+    }
     property bool rtl: false        // true = time runs right -> left
     property int dayOffset: 0       // 0 = today, -1 = yesterday, +1 = tomorrow...
     property double lastShift: 0
@@ -78,8 +152,8 @@ FloatingWindow {
                 ] : []
                 delegate: ColumnLayout {
                     Layout.fillWidth: true
-                    Text { text: modelData.k; color: "#7f8bb3"; font.pixelSize: 11; font.letterSpacing: 1.5 }
-                    Text { text: modelData.v; color: "#e6ebff"; font.pixelSize: 20; font.bold: true }
+                    Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
+                    Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
                 }
             }
         }
@@ -89,6 +163,7 @@ FloatingWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Connections { target: win; function onDChanged() { cv.requestPaint() } }
+            Connections { target: win; function onDmsChanged() { cv.requestPaint() } }
             onWidthChanged: requestPaint()
             onHeightChanged: requestPaint()
 
@@ -115,10 +190,15 @@ FloatingWindow {
                 function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
                 function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
 
+                var colAccent = win.c("primary", "#19b5e6")
+                var colOnSurface = win.c("on_surface", "#c8c6ce")
+                var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
+                var colSurface = win.c("surface_container", "#121318")
+
                 // day (light) + night (dark)
-                ctx.fillStyle = "#d8e8f5"
+                ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                 ctx.fillRect(L, T, pw, ph)
-                ctx.fillStyle = "#1a2342"
+                ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                 D.nights.forEach(function (n) {
                     var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
                     if (b <= a) return
@@ -132,18 +212,18 @@ FloatingWindow {
                 ctx.lineWidth = 1
                 for (var h = 0; h <= 24; h += 2) {
                     var gx = X(h), hh = h % 24
-                    ctx.strokeStyle = "rgba(128,140,180,0.35)"
+                    ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
                     ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
-                    ctx.fillStyle = "#9aa6cf"
+                    ctx.fillStyle = colOnSurfaceVar
                     ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
                 }
 
                 // height gridlines
                 ctx.textAlign = "right"
                 for (var m = Math.ceil(lo); m <= hi; m++) {
-                    ctx.strokeStyle = "rgba(128,140,180,0.25)"
+                    ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.25)
                     ctx.beginPath(); ctx.moveTo(L, Y(m)); ctx.lineTo(L + pw, Y(m)); ctx.stroke()
-                    ctx.fillStyle = "#9aa6cf"
+                    ctx.fillStyle = colOnSurfaceVar
                     ctx.fillText(m + " m", L - 6, Y(m) + 4)
                 }
 
@@ -163,18 +243,18 @@ FloatingWindow {
                 ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
                 ctx.beginPath(); trace()
                 ctx.lineTo(pts[pts.length - 1].x, T + ph); ctx.lineTo(pts[0].x, T + ph); ctx.closePath()
-                ctx.fillStyle = "rgba(25,181,230,0.25)"; ctx.fill()
+                ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
                 ctx.beginPath(); trace()
                 ctx.lineJoin = "round"; ctx.lineCap = "round"
-                ctx.strokeStyle = "#19b5e6"; ctx.lineWidth = 3; ctx.stroke()
+                ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
                 ctx.restore()
 
                 // now marker (only when today's window is in view)
                 if (D.now >= 0 && D.now <= 24) {
                     var nx = X(D.now), ny = Y(D.current)
-                    ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = 1
+                    ctx.strokeStyle = win.withAlpha(colOnSurface, 0.7); ctx.lineWidth = 1
                     ctx.beginPath(); ctx.moveTo(nx, T); ctx.lineTo(nx, T + ph); ctx.stroke()
-                    ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#19b5e6"; ctx.lineWidth = 3
+                    ctx.fillStyle = colAccent; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
                     ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
                 }
 
@@ -182,16 +262,16 @@ FloatingWindow {
                 D.extrema.forEach(function (e) {
                     if (e.h < 0 || e.h > 24) return
                     var ex = X(e.h), ey = Y(e.v)
-                    ctx.fillStyle = "#19b5e6"
+                    ctx.fillStyle = colAccent
                     ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI * 2); ctx.fill()
                     var t = (e.type === "high" ? "H " : "L ") + e.time + "  " + e.v.toFixed(2) + "m"
                     ctx.font = "12px monospace"; ctx.textAlign = "center"
                     var w = ctx.measureText(t).width + 12
                     var bx = Math.max(L + w / 2, Math.min(L + pw - w / 2, ex))
                     var by = e.type === "high" ? ey - 30 : ey + 12
-                    ctx.fillStyle = "rgba(10,16,32,0.85)"
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.9)
                     ctx.fillRect(bx - w / 2, by, w, 20)
-                    ctx.fillStyle = "#ffffff"
+                    ctx.fillStyle = colOnSurface
                     ctx.fillText(t, bx, by + 14)
                 })
             }
