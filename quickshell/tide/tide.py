@@ -90,6 +90,11 @@ def solve(A, b):
 
 hrs0 = lambda t: (t - start0).total_seconds() / 3600
 
+
+def clock_hours(s):
+    d = P(s)
+    return d.hour + d.minute / 60 + d.second / 3600
+
 pairs = [
     (hrs0(P(t)), v)
     for t, v in zip(data["tide"]["time"], data["tide"]["sea_level_height_msl"])
@@ -114,6 +119,22 @@ def fit0(h):
 
 # --- dense 10-minute grid from the fitted curve ---
 STEP = 1 / 6
+
+
+def year_range():
+    jan1 = start0.replace(month=1, day=1)
+    jan1_next = jan1.replace(year=jan1.year + 1)
+    h0 = (jan1 - start0).total_seconds() / 3600
+    h1 = (jan1_next - start0).total_seconds() / 3600
+    vals = []
+    h = h0
+    while h <= h1:
+        vals.append(fit0(h))
+        h += 0.25
+    return round(min(vals), 3), round(max(vals), 3)
+
+
+YEAR_LO, YEAR_HI = year_range()
 
 
 def build(offset):
@@ -142,13 +163,16 @@ def build(offset):
             )
 
     sun = data["sun"]
-    rise = hrs(P(sun["sunrise"][offset]))
-    sset = hrs(P(sun["sunset"][offset]))
-    nights = [[0, rise], [sset, 24]]
+    key = start.strftime("%Y-%m-%d")
+    rise_t = next((t for t in sun["sunrise"] if t.startswith(key)), sun["sunrise"][0])
+    set_t = next((t for t in sun["sunset"] if t.startswith(key)), sun["sunset"][0])
+    nights = [[0, clock_hours(rise_t)], [clock_hours(set_t), 24]]
 
     return {
         "station": STATION,
         "updated": updated(),
+        "yearLo": YEAR_LO,
+        "yearHi": YEAR_HI,
         "now": round(hn, 3),
         "current": round(fit(hn), 3),
         "rising": fit(hn + 0.25) > fit(hn),

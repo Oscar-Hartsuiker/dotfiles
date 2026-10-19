@@ -247,7 +247,7 @@ FloatingWindow {
                 ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
                 ctx.beginPath(); trace()
                 ctx.lineTo(pts[pts.length - 1].x, T + ph); ctx.lineTo(pts[0].x, T + ph); ctx.closePath()
-                ctx.globalAlpha = 0.18; ctx.fillStyle = tideHeat; ctx.fill(); ctx.globalAlpha = 1
+                ctx.globalAlpha = 0.10; ctx.fillStyle = tideHeat; ctx.fill(); ctx.globalAlpha = 1
                 ctx.beginPath(); trace()
                 ctx.lineJoin = "round"; ctx.lineCap = "round"
                 ctx.strokeStyle = tideHeat; ctx.lineWidth = 3; ctx.stroke()
@@ -256,9 +256,9 @@ FloatingWindow {
                 // now marker (only when today's window is in view)
                 if (D.now >= 0 && D.now <= 24) {
                     var nx = X(D.now), ny = Y(D.current)
-                    ctx.strokeStyle = win.withAlpha(colOnSurface, 0.7); ctx.lineWidth = 1
+                    ctx.strokeStyle = win.withAlpha("#ff2d95", 0.7); ctx.lineWidth = 2
                     ctx.beginPath(); ctx.moveTo(nx, T); ctx.lineTo(nx, T + ph); ctx.stroke()
-                    ctx.fillStyle = colAccent; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
+                    ctx.fillStyle = "#ff2d95"; ctx.strokeStyle = colOnSurface; ctx.lineWidth = 3
                     ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
                 }
 
