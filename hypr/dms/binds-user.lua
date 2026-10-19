@@ -9,4 +9,6 @@ hl.bind("SUPER + S", hl.dsp.exec_cmd("dms ipc call dock toggleAutoHide"), { desc
 hl.unbind("SUPER + SHIFT + S")
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("dms ipc call dock toggle"), { description = "Dock: Toggle" })
 hl.unbind("SUPER + Tab")
-hl.bind("SUPER + Tab", hl.dsp.exec_cmd('sh -c "| `dms ipc wallpaperCarousel toggle`"'))
+hl.bind("SUPER + Tab", hl.dsp.exec_cmd("sh -c \"| `dms ipc wallpaperCarousel toggle`\""))
+hl.unbind("SUPER + ALT + F")
+hl.bind("SUPER + ALT + F", hl.dsp.exec_cmd("sh -c \"quickshell -c forecast\""))

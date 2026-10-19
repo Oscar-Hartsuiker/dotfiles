@@ -153,7 +153,7 @@ def combine(days):
     out = dict(days[0])
     out.update(
         {
-            "label": "10-day",
+            "label": "7-day",
             "span": pts[-1][0],
             "points": pts,
             "gusts": gusts,
@@ -170,7 +170,7 @@ def main():
     args = sys.argv[1:]
     data = fetch()
     if args and args[0] == "all":
-        print(json.dumps(combine([build(data, off) for off in range(10)])))
+        print(json.dumps(combine([build(data, off) for off in range(7)])))
     else:
         off = int(args[0]) if args else 0
         print(json.dumps(build(data, off)))

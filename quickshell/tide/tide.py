@@ -200,7 +200,7 @@ def combine(days):
     out = dict(days[0])
     out.update(
         {
-            "label": "10-day",
+            "label": "7-day",
             "span": pts[-1][0],
             "points": pts,
             "extrema": ext_all,
@@ -213,7 +213,7 @@ def combine(days):
 
 def main():
     args = sys.argv[1:]
-    offsets = range(10)
+    offsets = range(7)
     if args and args[0] == "all":
         print(json.dumps(combine([build(off) for off in offsets])))
     else:

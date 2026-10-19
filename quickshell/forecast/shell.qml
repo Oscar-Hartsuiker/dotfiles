@@ -27,14 +27,6 @@ FloatingWindow {
         var n = parseInt(h, 16)
         return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
     }
-    function graphDayBg() {
-        var dark = !dms || dms.mode !== "light"
-        return c(dark ? "surface_container_low" : "surface_container_lowest", dark ? "#1a1c20" : "#ffffff")
-    }
-    function graphNightBg() {
-        var dark = !dms || dms.mode !== "light"
-        return c(dark ? "surface_container_lowest" : "surface_container_high", dark ? "#0c0e13" : "#ededf4")
-    }
     function heatGradient(ctx, yTop, yBottom, topValue, stops) {
         var g = ctx.createLinearGradient(0, yTop, 0, yBottom)
         g.addColorStop(0, stops[0][1])
@@ -74,10 +66,12 @@ FloatingWindow {
     }
 
     property bool rtl: false
+    property int dayCount: 7
     property int dayOffset: 0
     property double lastShift: 0
     property double lastG: 0
     property bool overview: false
+    property int chartView: 0
     property var moonNow: new Date()
     property bool tooltipOn: false
     property int tooltipGraph: 0
@@ -144,7 +138,7 @@ FloatingWindow {
     }
     function shift(n) {
         if (overview) return
-        var o = Math.max(0, Math.min(9, dayOffset + n))
+        var o = Math.max(0, Math.min(dayCount - 1, dayOffset + n))
         if (o === dayOffset) return
         dayOffset = o
         refresh()
@@ -158,8 +152,11 @@ FloatingWindow {
         overview = !overview
         refresh()
     }
+    function cycleChartView(dir) {
+        chartView = (chartView + dir + 4) % 4
+    }
     function gotoDay(i) {
-        var o = Math.max(0, Math.min(9, i))
+        var o = Math.max(0, Math.min(dayCount - 1, i))
         if (!overview && o === dayOffset) return
         overview = false
         dayOffset = o
@@ -187,7 +184,7 @@ FloatingWindow {
         return shortDays[d.getDay()] + " " + d.getDate()
     }
     function dayAt(x, w) {
-        return Math.max(0, Math.min(9, Math.floor(x / w * 10)))
+        return Math.max(0, Math.min(dayCount - 1, Math.floor(x / w * dayCount)))
     }
 
     function mainData() {
@@ -380,6 +377,10 @@ FloatingWindow {
 
         Keys.onLeftPressed: if (!win.helpVisible) win.shift(-1)
         Keys.onRightPressed: if (!win.helpVisible) win.shift(1)
+        Keys.onTabPressed: (e) => {
+            if (!win.helpVisible) win.cycleChartView((e.modifiers & Qt.ShiftModifier) ? -1 : 1)
+            e.accepted = true
+        }
         Keys.onPressed: (e) => {
             if (e.key === Qt.Key_Slash || e.key === Qt.Key_Question) {
                 win.helpVisible = !win.helpVisible
@@ -392,7 +393,7 @@ FloatingWindow {
             if (e.key === Qt.Key_G) {
                 if (e.modifiers & Qt.ShiftModifier) {
                     win.lastG = 0
-                    win.gotoDay(9)
+                    win.gotoDay(win.dayCount - 1)
                 } else {
                     var now = Date.now()
                     if (now - win.lastG < 700) {
@@ -412,8 +413,7 @@ FloatingWindow {
             else if (e.key === Qt.Key_J) win.moveTooltipGraph(1)
             else if (e.key === Qt.Key_K) win.moveTooltipGraph(-1)
             else if (e.key === Qt.Key_N) win.shift((e.modifiers & Qt.ShiftModifier) ? -1 : 1)
-            else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_9) win.gotoDay(e.key - Qt.Key_1)
-            else if (e.key === Qt.Key_0) win.gotoDay(9)
+            else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_7) win.gotoDay(e.key - Qt.Key_1)
         }
         WheelHandler {
             orientation: Qt.Horizontal
@@ -466,7 +466,7 @@ FloatingWindow {
                 }
                 Text {
                     Layout.alignment: Qt.AlignRight
-                    text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 10-day") + "  ·  / = keys"
+                    text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 7-day") + "  ·  / = keys"
                     color: win.c("on_surface_variant", "#7f8bb3")
                     font.pixelSize: 12
                 }
@@ -478,6 +478,7 @@ FloatingWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 4
+            visible: win.chartView === 0 || win.chartView === 1
 
             RowLayout {
                 Layout.fillWidth: true
@@ -561,9 +562,9 @@ FloatingWindow {
                     var windTop = Math.max(hi, 30)
                     var windHeat = win.heatGradient(ctx, Y(windTop), Y(0), windTop, windStops)
 
-                    ctx.fillStyle = win.graphDayBg()
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
-                    ctx.fillStyle = win.graphNightBg()
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
                         var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
@@ -683,6 +684,7 @@ FloatingWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 4
+            visible: win.chartView === 0 || win.chartView === 2
 
             RowLayout {
                 Layout.fillWidth: true
@@ -758,7 +760,7 @@ FloatingWindow {
                     var maxV = Math.max.apply(null, D.points.map(function (p) { return p[1] }))
                     var step = 1
                     var lo = 0
-                    var hi = Math.max(6, Math.ceil(maxV / step) * step)
+                    var hi = Math.max(5, Math.ceil(maxV / step) * step)
 
                     var pv = D.periods.map(function (p) { return p[1] })
                     var pLo = Math.max(0, Math.floor((Math.min.apply(null, pv) - 2) / 2) * 2)
@@ -777,9 +779,9 @@ FloatingWindow {
                     var swellTop = Math.max(hi, 6)
                     var swellHeat = win.heatGradient(ctx, Y(swellTop), Y(0), swellTop, swellStops)
 
-                    ctx.fillStyle = win.graphDayBg()
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
-                    ctx.fillStyle = win.graphNightBg()
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
                         var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
@@ -908,6 +910,7 @@ FloatingWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 4
+            visible: win.chartView === 0 || win.chartView === 3
 
             RowLayout {
                 Layout.fillWidth: true
@@ -919,9 +922,9 @@ FloatingWindow {
                 }
                 Repeater {
                     model: win.dTide ? (win.overview ? [
-                        { k: "10-DAY HIGH",
+                        { k: win.dayCount + "-DAY HIGH",
                           v: Math.max.apply(null, win.dTide.points.map(function (p) { return p[1] })).toFixed(2) + " m" },
-                        { k: "10-DAY LOW",
+                        { k: win.dayCount + "-DAY LOW",
                           v: Math.min.apply(null, win.dTide.points.map(function (p) { return p[1] })).toFixed(2) + " m" },
                         { k: "RANGE",
                           v: (Math.max.apply(null, win.dTide.points.map(function (p) { return p[1] }))
@@ -1051,9 +1054,9 @@ FloatingWindow {
                     tideHeat.addColorStop(0.5, "#facc15")
                     tideHeat.addColorStop(1, "#22c55e")
 
-                    ctx.fillStyle = win.graphDayBg()
+                    ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
-                    ctx.fillStyle = win.graphNightBg()
+                    ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
                         var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
@@ -1168,7 +1171,7 @@ FloatingWindow {
                 spacing: 0
 
                 Repeater {
-                    model: 10
+                    model: win.dayCount
                     delegate: Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -1263,8 +1266,9 @@ FloatingWindow {
                         { k: "n / N", d: "next / previous day" },
                         { k: "gg / G", d: "first / last day" },
                         { k: "Home", d: "jump to today" },
-                        { k: "Space", d: "toggle 10-day overview" },
-                        { k: "1–9 / 0", d: "jump to day 1–9 / day 10" },
+                        { k: "Space", d: "toggle 7-day overview" },
+                        { k: "Tab / ⇧Tab", d: "cycle wind / swell / tide / all" },
+                        { k: "1–7", d: "jump to day 1–7" },
                         { k: "left click", d: "show tooltip at cursor" },
                         { k: "right click", d: "hide tooltip" },
                         { k: "i", d: "toggle tooltip" },
