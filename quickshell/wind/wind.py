@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""wind.py [dayOffset] -> JSON for the wind chart (GFS via Open-Meteo, knots)."""
+"""wind.py [dayOffset|all] -> JSON for the wind chart (GFS via Open-Meteo, knots)."""
 
 import json, math, sys, time, urllib.parse, urllib.request
 from datetime import datetime, timedelta
@@ -72,9 +72,7 @@ def sun_times(day, lat, lon, tz_hours):
     return rise / 60 + tz_hours, sset / 60 + tz_hours
 
 
-def main():
-    off = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-    data = fetch()
+def build(data, off):
     h = data["hourly"]
     idx = {t: i for i, t in enumerate(h["time"])}
 
@@ -116,7 +114,7 @@ def main():
 
     rise, sset = sun_times(day, LAT, LON, day.utcoffset().total_seconds() / 3600)
     peak = max(gusts, key=lambda p: p[1])
-    out = {
+    return {
         "station": STATION,
         "label": day.strftime("%a %d %b"),
         "unit": "kn",
@@ -129,7 +127,45 @@ def main():
         "nights": [[0, round(rise, 2)], [round(sset, 2), 24]],
         "max_gust": {"h": peak[0], "v": peak[1], "time": f"{peak[0] % 24:02d}:00"},
     }
-    print(json.dumps(out))
+
+
+def combine(days):
+    pts, gusts, dirs, nights, meta = [], [], [], [], []
+    last_i = len(days) - 1
+    for off, d in enumerate(days):
+        base = off * 24
+        for arr, dst in ((d["points"], pts), (d["gusts"], gusts), (d["dirs"], dirs)):
+            for hh, vv in arr:
+                if hh < 24 or off == last_i:
+                    dst.append([base + hh, vv])
+        for n in d["nights"]:
+            nights.append([base + n[0], base + n[1]])
+        meta.append({"h": base, "label": d["label"], "short": d["label"][:6]})
+    peak = max(gusts, key=lambda p: p[1])
+    out = dict(days[0])
+    out.update(
+        {
+            "label": "10-day",
+            "span": pts[-1][0],
+            "points": pts,
+            "gusts": gusts,
+            "dirs": dirs,
+            "nights": nights,
+            "days": meta,
+            "max_gust": {"h": peak[0], "v": peak[1], "time": f"{peak[0] % 24:02d}:00"},
+        }
+    )
+    return out
+
+
+def main():
+    args = sys.argv[1:]
+    data = fetch()
+    if args and args[0] == "all":
+        print(json.dumps(combine([build(data, off) for off in range(10)])))
+    else:
+        off = int(args[0]) if args else 0
+        print(json.dumps(build(data, off)))
 
 
 if __name__ == "__main__":

@@ -194,6 +194,10 @@ FloatingWindow {
                 var colOnSurface = win.c("on_surface", "#c8c6ce")
                 var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                 var colSurface = win.c("surface_container", "#121318")
+                var tideHeat = ctx.createLinearGradient(0, Y(hi), 0, Y(lo))
+                tideHeat.addColorStop(0, "#ef4444")
+                tideHeat.addColorStop(0.5, "#facc15")
+                tideHeat.addColorStop(1, "#22c55e")
 
                 // day (light) + night (dark)
                 ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
@@ -243,10 +247,10 @@ FloatingWindow {
                 ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
                 ctx.beginPath(); trace()
                 ctx.lineTo(pts[pts.length - 1].x, T + ph); ctx.lineTo(pts[0].x, T + ph); ctx.closePath()
-                ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                ctx.globalAlpha = 0.18; ctx.fillStyle = tideHeat; ctx.fill(); ctx.globalAlpha = 1
                 ctx.beginPath(); trace()
                 ctx.lineJoin = "round"; ctx.lineCap = "round"
-                ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                ctx.strokeStyle = tideHeat; ctx.lineWidth = 3; ctx.stroke()
                 ctx.restore()
 
                 // now marker (only when today's window is in view)

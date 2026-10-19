@@ -26,6 +26,16 @@ FloatingWindow {
         var n = parseInt(h, 16)
         return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
     }
+    function heatGradient(ctx, yTop, yBottom, topValue, stops) {
+        var g = ctx.createLinearGradient(0, yTop, 0, yBottom)
+        g.addColorStop(0, stops[0][1])
+        for (var i = 0; i < stops.length; i++) {
+            var o = (topValue - stops[i][0]) / topValue
+            g.addColorStop(Math.max(0, Math.min(1, o)), stops[i][1])
+        }
+        g.addColorStop(1, stops[stops.length - 1][1])
+        return g
+    }
 
     IpcHandler { target: "toggle"; function toggle(): void { win.visible = !win.visible } }
     IpcHandler { target: "show";   function show(): void { win.visible = true } }
@@ -165,10 +175,12 @@ FloatingWindow {
                 function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
 
                 var colAccent = win.c("primary", "#19b5e6")
-                var colGust = win.c("tertiary", "#e6a419")
                 var colOnSurface = win.c("on_surface", "#c8c6ce")
                 var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                 var colSurface = win.c("surface_container", "#121318")
+                var windStops = [[30, "#ef4444"], [20, "#facc15"], [10, "#22c55e"]]
+                var windTop = Math.max(hi, 30)
+                var windHeat = win.heatGradient(ctx, Y(windTop), Y(0), windTop, windStops)
 
                 // day + night
                 ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
@@ -222,15 +234,15 @@ FloatingWindow {
                 ctx.beginPath(); trace(gp)
                 ctx.setLineDash([6, 5])
                 ctx.lineJoin = "round"; ctx.lineCap = "round"
-                ctx.strokeStyle = colGust; ctx.lineWidth = 2; ctx.stroke()
+                ctx.strokeStyle = windHeat; ctx.lineWidth = 2; ctx.stroke()
                 ctx.setLineDash([])
 
                 // speed curve + fill
                 ctx.beginPath(); trace(sp)
                 ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
-                ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                ctx.globalAlpha = 0.18; ctx.fillStyle = windHeat; ctx.fill(); ctx.globalAlpha = 1
                 ctx.beginPath(); trace(sp)
-                ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                ctx.strokeStyle = windHeat; ctx.lineWidth = 3; ctx.stroke()
                 ctx.restore()
 
                 // direction arrows every 2 h on the speed line (points downwind)
@@ -260,8 +272,8 @@ FloatingWindow {
 
                 // legend
                 ctx.font = "11px monospace"; ctx.textAlign = "right"
-                ctx.fillStyle = colAccent; ctx.fillText("— wind", L + pw - 70, T + 14)
-                ctx.fillStyle = colGust;   ctx.fillText("- - gust", L + pw - 6, T + 14)
+                ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— wind", L + pw - 70, T + 14)
+                ctx.fillStyle = colOnSurfaceVar; ctx.fillText("- - gust", L + pw - 6, T + 14)
             }
         }
     }

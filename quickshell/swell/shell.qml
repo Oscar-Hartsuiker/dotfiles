@@ -25,6 +25,16 @@ FloatingWindow {
         var n = parseInt(h, 16)
         return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
     }
+    function heatGradient(ctx, yTop, yBottom, topValue, stops) {
+        var g = ctx.createLinearGradient(0, yTop, 0, yBottom)
+        g.addColorStop(0, stops[0][1])
+        for (var i = 0; i < stops.length; i++) {
+            var o = (topValue - stops[i][0]) / topValue
+            g.addColorStop(Math.max(0, Math.min(1, o)), stops[i][1])
+        }
+        g.addColorStop(1, stops[stops.length - 1][1])
+        return g
+    }
 
     IpcHandler { target: "toggle"; function toggle(): void { win.visible = !win.visible } }
     IpcHandler { target: "show";   function show(): void { win.visible = true } }
@@ -188,6 +198,9 @@ FloatingWindow {
                 var colOnSurface = win.c("on_surface", "#c8c6ce")
                 var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                 var colSurface = win.c("surface_container", "#121318")
+                var swellStops = [[6, "#ef4444"], [3, "#facc15"], [2, "#22c55e"]]
+                var swellTop = Math.max(hi, 6)
+                var swellHeat = win.heatGradient(ctx, Y(swellTop), Y(0), swellTop, swellStops)
 
                 // day + night
                 ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
@@ -247,10 +260,10 @@ FloatingWindow {
                 // height curve + fill
                 ctx.beginPath(); trace(sp)
                 ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
-                ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                ctx.globalAlpha = 0.18; ctx.fillStyle = swellHeat; ctx.fill(); ctx.globalAlpha = 1
                 ctx.beginPath(); trace(sp)
                 ctx.lineJoin = "round"; ctx.lineCap = "round"
-                ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                ctx.strokeStyle = swellHeat; ctx.lineWidth = 3; ctx.stroke()
 
                 // period curve (dashed)
                 ctx.beginPath(); trace(pp)
@@ -292,7 +305,7 @@ FloatingWindow {
 
                 // legend
                 ctx.font = "11px monospace"; ctx.textAlign = "right"
-                ctx.fillStyle = colAccent; ctx.fillText("— height", L + pw - 76, T + 14)
+                ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— height", L + pw - 76, T + 14)
                 ctx.fillStyle = colPeriod; ctx.fillText("- - period", L + pw - 6, T + 14)
             }
         }

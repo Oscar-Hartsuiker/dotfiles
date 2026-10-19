@@ -27,6 +27,16 @@ FloatingWindow {
         var n = parseInt(h, 16)
         return "rgba(" + ((n >> 24) & 255) + "," + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + a + ")"
     }
+    function heatGradient(ctx, yTop, yBottom, topValue, stops) {
+        var g = ctx.createLinearGradient(0, yTop, 0, yBottom)
+        g.addColorStop(0, stops[0][1])
+        for (var i = 0; i < stops.length; i++) {
+            var o = (topValue - stops[i][0]) / topValue
+            g.addColorStop(Math.max(0, Math.min(1, o)), stops[i][1])
+        }
+        g.addColorStop(1, stops[stops.length - 1][1])
+        return g
+    }
 
     IpcHandler { target: "toggle"; function toggle(): void { win.visible = !win.visible } }
     IpcHandler { target: "show";   function show(): void { win.visible = true } }
@@ -58,10 +68,11 @@ FloatingWindow {
     property bool rtl: false
     property int dayOffset: 0
     property double lastShift: 0
+    property bool overview: false
 
     Process {
         id: windProc
-        command: ["python3", Quickshell.shellDir + "/wind.py", String(win.dayOffset)]
+        command: ["python3", Quickshell.shellDir + "/wind.py", win.overview ? "all" : String(win.dayOffset)]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -71,7 +82,7 @@ FloatingWindow {
     }
     Process {
         id: swellProc
-        command: ["python3", Quickshell.shellDir + "/swell.py", String(win.dayOffset)]
+        command: ["python3", Quickshell.shellDir + "/swell.py", win.overview ? "all" : String(win.dayOffset)]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -81,7 +92,7 @@ FloatingWindow {
     }
     Process {
         id: tideProc
-        command: ["python3", Quickshell.shellDir + "/tide.py", String(win.dayOffset)]
+        command: ["python3", Quickshell.shellDir + "/tide.py", win.overview ? "all" : String(win.dayOffset)]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -100,6 +111,7 @@ FloatingWindow {
     }
 
     function shift(n) {
+        if (overview) return
         var o = Math.max(0, Math.min(9, dayOffset + n))
         if (o === dayOffset) return
         dayOffset = o
@@ -109,8 +121,15 @@ FloatingWindow {
         restart.start()
     }
     function today() {
-        if (dayOffset === 0) return
+        if (overview || dayOffset === 0) return
         dayOffset = 0
+        windProc.running = false
+        swellProc.running = false
+        tideProc.running = false
+        restart.start()
+    }
+    function toggleOverview() {
+        overview = !overview
         windProc.running = false
         swellProc.running = false
         tideProc.running = false
@@ -154,19 +173,51 @@ FloatingWindow {
     }
     function fmtTide(e) { return e ? e.time + "  " + e.v.toFixed(2) + " m" : "--" }
 
+    function paintTimeGrid(ctx, X, T, ph, span, days, labelColor, lineColor) {
+        ctx.font = "12px monospace"
+        ctx.textAlign = "center"
+        ctx.lineWidth = 1
+        if (days && span > 24) {
+            for (var i = 0; i < days.length; i++) {
+                var gx = X(days[i].h)
+                ctx.strokeStyle = win.withAlpha(lineColor, 0.35)
+                ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
+                ctx.strokeStyle = win.withAlpha(lineColor, 0.18)
+                var gm = X(days[i].h + 12)
+                ctx.beginPath(); ctx.moveTo(gm, T); ctx.lineTo(gm, T + ph); ctx.stroke()
+                ctx.fillStyle = labelColor
+                ctx.fillText(days[i].short || days[i].label, gx, T - 8)
+            }
+            var gxEnd = X(span)
+            ctx.strokeStyle = win.withAlpha(lineColor, 0.35)
+            ctx.beginPath(); ctx.moveTo(gxEnd, T); ctx.lineTo(gxEnd, T + ph); ctx.stroke()
+        } else {
+            for (var h = 0; h <= 24; h += 2) {
+                var gx2 = X(h), hh = h % 24
+                ctx.strokeStyle = win.withAlpha(lineColor, 0.35)
+                ctx.beginPath(); ctx.moveTo(gx2, T); ctx.lineTo(gx2, T + ph); ctx.stroke()
+                ctx.fillStyle = labelColor
+                ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx2, T - 8)
+            }
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 10
+        spacing: 4
         focus: true
 
         Keys.onLeftPressed: win.shift(-1)
         Keys.onRightPressed: win.shift(1)
-        Keys.onPressed: (e) => { if (e.key === Qt.Key_Home) win.today() }
+        Keys.onPressed: (e) => {
+            if (e.key === Qt.Key_Home) win.today()
+            else if (e.key === Qt.Key_Space) win.toggleOverview()
+        }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 28
+            spacing: 24
 
             ColumnLayout {
                 spacing: 0
@@ -187,14 +238,15 @@ FloatingWindow {
                 }
                 Text {
                     text: win.mainData()
-                        ? win.mainData().label + (win.dayOffset === 0 ? "  · today" : "")
+                        ? (win.overview ? win.mainData().label
+                                        : win.mainData().label + (win.dayOffset === 0 ? "  · today" : ""))
                         : "--"
                     color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true
                 }
             }
             Item { Layout.fillWidth: true }
             Text {
-                text: "← → / scroll  ·  Home = today"
+                text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 10-day")
                 color: win.c("on_surface_variant", "#7f8bb3")
                 font.pixelSize: 11
             }
@@ -214,14 +266,19 @@ FloatingWindow {
                     font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
-                    model: win.dWind ? [
+                    model: win.dWind ? (win.overview ? [
+                        { k: "MAX WIND",
+                          v: Math.max.apply(null, win.dWind.points.map(function (p) { return p[1] })).toFixed(1) + " kn" },
+                        { k: "MAX GUST", v: win.dWind.max_gust.v.toFixed(1) + " kn" },
+                        { k: "GUST PEAK", v: win.dWind.max_gust.time }
+                    ] : [
                         { k: win.dayOffset === 0 ? "NOW" : "AVG",
                           v: (win.dayOffset === 0 ? win.dWind.current.toFixed(1)
                               : (win.dWind.points.reduce(function (a, p) { return a + p[1] }, 0) / win.dWind.points.length).toFixed(1))
                              + " kn" + (win.dayOffset === 0 ? (win.dWind.rising ? " ▲" : " ▼") : "") },
                         { k: "FROM", v: win.dirText(win.dWind) },
                         { k: "MAX GUST", v: win.dWind.max_gust.time + "  " + win.dWind.max_gust.v.toFixed(1) + " kn" }
-                    ] : []
+                    ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
                         Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
@@ -256,38 +313,32 @@ FloatingWindow {
 
                     var L = 44, R = 44, T = 26, B = 8
                     var pw = width - L - R, ph = height - T - B
+                    var span = (win.overview && D.span) ? D.span : 24
                     var maxV = Math.max.apply(null, D.gusts.map(function (p) { return p[1] }))
                     var lo = 0
                     var hi = Math.max(10, Math.ceil((maxV + 2) / 5) * 5)
-                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function X(h) { var f = h / span; if (win.rtl) f = 1 - f; return L + f * pw }
                     function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
 
                     var colAccent = win.c("primary", "#19b5e6")
-                    var colGust = win.c("tertiary", "#e6a419")
                     var colOnSurface = win.c("on_surface", "#c8c6ce")
                     var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                     var colSurface = win.c("surface_container", "#121318")
+                    var windStops = [[30, "#ef4444"], [20, "#facc15"], [10, "#22c55e"]]
+                    var windTop = Math.max(hi, 30)
+                    var windHeat = win.heatGradient(ctx, Y(windTop), Y(0), windTop, windStops)
 
                     ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
                     ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
-                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
                         var x1 = X(a), x2 = X(b)
                         ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
                     })
 
-                    ctx.font = "12px monospace"
-                    ctx.textAlign = "center"
-                    ctx.lineWidth = 1
-                    for (var h = 0; h <= 24; h += 2) {
-                        var gx = X(h), hh = h % 24
-                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
-                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
-                        ctx.fillStyle = colOnSurfaceVar
-                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
-                    }
+                    win.paintTimeGrid(ctx, X, T, ph, span, win.overview ? D.days : null, colOnSurfaceVar, colOnSurfaceVar)
 
                     ctx.textAlign = "right"
                     for (var k = 0; k <= hi; k += 5) {
@@ -316,18 +367,18 @@ FloatingWindow {
                     ctx.beginPath(); trace(gp)
                     ctx.setLineDash([6, 5])
                     ctx.lineJoin = "round"; ctx.lineCap = "round"
-                    ctx.strokeStyle = colGust; ctx.lineWidth = 2; ctx.stroke()
+                    ctx.strokeStyle = windHeat; ctx.lineWidth = 2; ctx.stroke()
                     ctx.setLineDash([])
 
                     ctx.beginPath(); trace(sp)
                     ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
-                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.globalAlpha = 0.18; ctx.fillStyle = windHeat; ctx.fill(); ctx.globalAlpha = 1
                     ctx.beginPath(); trace(sp)
-                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                    ctx.strokeStyle = windHeat; ctx.lineWidth = 3; ctx.stroke()
                     ctx.restore()
 
                     D.dirs.forEach(function (e, i) {
-                        if (e[0] % 2 !== 0 || e[0] > 24) return
+                        if (win.overview ? (e[0] % 24 !== 12) : (e[0] % 2 !== 0 || e[0] > 24)) return
                         var p = sp[i]
                         if (!p) return
                         ctx.save()
@@ -350,8 +401,8 @@ FloatingWindow {
                     }
 
                     ctx.font = "11px monospace"; ctx.textAlign = "right"
-                    ctx.fillStyle = colAccent; ctx.fillText("— wind", L + pw - 70, T + 14)
-                    ctx.fillStyle = colGust;   ctx.fillText("- - gust", L + pw - 6, T + 14)
+                    ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— wind", L + pw - 70, T + 14)
+                    ctx.fillStyle = colOnSurfaceVar; ctx.fillText("- - gust", L + pw - 6, T + 14)
                 }
             }
         }
@@ -370,7 +421,13 @@ FloatingWindow {
                     font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
-                    model: win.dSwell ? [
+                    model: win.dSwell ? (win.overview ? [
+                        { k: "MAX HEIGHT",
+                          v: Math.max.apply(null, win.dSwell.points.map(function (p) { return p[1] })).toFixed(2) + " m" },
+                        { k: "PEAK PERIOD",
+                          v: Math.max.apply(null, win.dSwell.periods.map(function (p) { return p[1] })).toFixed(0) + " s" },
+                        { k: "PEAK", v: win.dSwell.peak.time }
+                    ] : [
                         { k: win.dayOffset === 0 ? "NOW" : "AVG",
                           v: (win.dayOffset === 0 ? win.dSwell.current.toFixed(2)
                               : (win.dSwell.points.reduce(function (a, p) { return a + p[1] }, 0) / win.dSwell.points.length).toFixed(2))
@@ -378,7 +435,7 @@ FloatingWindow {
                         { k: "PERIOD", v: win.periodText(win.dSwell) },
                         { k: "FROM", v: win.dirText(win.dSwell) },
                         { k: "PEAK", v: win.dSwell.peak.time + "  " + win.dSwell.peak.v.toFixed(2) + " m" }
-                    ] : []
+                    ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
                         Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
@@ -413,6 +470,7 @@ FloatingWindow {
 
                     var L = 44, R = 44, T = 26, B = 8
                     var pw = width - L - R, ph = height - T - B
+                    var span = (win.overview && D.span) ? D.span : 24
 
                     var maxV = Math.max.apply(null, D.points.map(function (p) { return p[1] }))
                     var step = maxV > 3 ? 1 : 0.5
@@ -423,7 +481,7 @@ FloatingWindow {
                     var pLo = Math.max(0, Math.floor((Math.min.apply(null, pv) - 2) / 2) * 2)
                     var pHi = Math.ceil((Math.max.apply(null, pv) + 2) / 2) * 2
 
-                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function X(h) { var f = h / span; if (win.rtl) f = 1 - f; return L + f * pw }
                     function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
                     function Yp(v) { return T + (1 - (v - pLo) / (pHi - pLo)) * ph }
 
@@ -432,27 +490,21 @@ FloatingWindow {
                     var colOnSurface = win.c("on_surface", "#c8c6ce")
                     var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                     var colSurface = win.c("surface_container", "#121318")
+                    var swellStops = [[6, "#ef4444"], [3, "#facc15"], [2, "#22c55e"]]
+                    var swellTop = Math.max(hi, 6)
+                    var swellHeat = win.heatGradient(ctx, Y(swellTop), Y(0), swellTop, swellStops)
 
                     ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
                     ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
-                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
                         var x1 = X(a), x2 = X(b)
                         ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
                     })
 
-                    ctx.font = "12px monospace"
-                    ctx.textAlign = "center"
-                    ctx.lineWidth = 1
-                    for (var h = 0; h <= 24; h += 2) {
-                        var gx = X(h), hh = h % 24
-                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
-                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
-                        ctx.fillStyle = colOnSurfaceVar
-                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
-                    }
+                    win.paintTimeGrid(ctx, X, T, ph, span, win.overview ? D.days : null, colOnSurfaceVar, colOnSurfaceVar)
 
                     ctx.textAlign = "right"
                     for (var k = 0; k <= hi + 0.001; k += step) {
@@ -486,10 +538,10 @@ FloatingWindow {
 
                     ctx.beginPath(); trace(sp)
                     ctx.lineTo(sp[sp.length - 1].x, T + ph); ctx.lineTo(sp[0].x, T + ph); ctx.closePath()
-                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.globalAlpha = 0.18; ctx.fillStyle = swellHeat; ctx.fill(); ctx.globalAlpha = 1
                     ctx.beginPath(); trace(sp)
                     ctx.lineJoin = "round"; ctx.lineCap = "round"
-                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                    ctx.strokeStyle = swellHeat; ctx.lineWidth = 3; ctx.stroke()
 
                     ctx.beginPath(); trace(pp)
                     ctx.setLineDash([6, 5])
@@ -499,13 +551,15 @@ FloatingWindow {
 
                     ctx.font = "bold 11px monospace"; ctx.textAlign = "center"
                     D.periods.forEach(function (e, i) {
-                        if (e[0] % 2 !== 0 || !pp[i]) return
+                        if (win.overview ? (e[0] % 24 !== 12) : (e[0] % 2 !== 0)) return
+                        if (!pp[i]) return
                         ctx.fillStyle = colPeriod
                         ctx.fillText(e[1].toFixed(0) + "s", pp[i].x, Math.max(T + 12, pp[i].y - 8))
                     })
 
                     D.dirs.forEach(function (e, i) {
-                        if (e[0] % 2 !== 0 || !sp[i]) return
+                        if (win.overview ? (e[0] % 24 !== 12) : (e[0] % 2 !== 0)) return
+                        if (!sp[i]) return
                         ctx.save()
                         ctx.translate(sp[i].x, sp[i].y)
                         ctx.rotate((e[1] + 180) * Math.PI / 180)
@@ -526,7 +580,7 @@ FloatingWindow {
                     }
 
                     ctx.font = "11px monospace"; ctx.textAlign = "right"
-                    ctx.fillStyle = colAccent; ctx.fillText("— height", L + pw - 76, T + 14)
+                    ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— height", L + pw - 76, T + 14)
                     ctx.fillStyle = colPeriod; ctx.fillText("- - period", L + pw - 6, T + 14)
                 }
             }
@@ -546,12 +600,20 @@ FloatingWindow {
                     font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
-                    model: win.dTide ? [
+                    model: win.dTide ? (win.overview ? [
+                        { k: "10-DAY HIGH",
+                          v: Math.max.apply(null, win.dTide.points.map(function (p) { return p[1] })).toFixed(2) + " m" },
+                        { k: "10-DAY LOW",
+                          v: Math.min.apply(null, win.dTide.points.map(function (p) { return p[1] })).toFixed(2) + " m" },
+                        { k: "RANGE",
+                          v: (Math.max.apply(null, win.dTide.points.map(function (p) { return p[1] }))
+                              - Math.min.apply(null, win.dTide.points.map(function (p) { return p[1] }))).toFixed(2) + " m" }
+                    ] : [
                         { k: "NOW",
                           v: win.dTide.current.toFixed(2) + " m " + (win.dTide.rising ? "▲" : "▼") },
                         { k: win.dayOffset === 0 ? "NEXT HIGH" : "HIGH", v: win.fmtTide(win.nextTide(win.dTide, "high")) },
                         { k: win.dayOffset === 0 ? "NEXT LOW"  : "LOW",  v: win.fmtTide(win.nextTide(win.dTide, "low")) }
-                    ] : []
+                    ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
                         Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
@@ -586,37 +648,33 @@ FloatingWindow {
 
                     var L = 44, R = 44, T = 26, B = 8
                     var pw = width - L - R, ph = height - T - B
+                    var span = (win.overview && D.span) ? D.span : 24
                     var vs = D.points.map(function (p) { return p[1] })
                     var lo = Math.min.apply(null, vs) - 0.15
                     var hi = Math.max.apply(null, vs) + 0.15
-                    function X(h) { var f = h / 24; if (win.rtl) f = 1 - f; return L + f * pw }
+                    function X(h) { var f = h / span; if (win.rtl) f = 1 - f; return L + f * pw }
                     function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
 
                     var colAccent = win.c("primary", "#19b5e6")
                     var colOnSurface = win.c("on_surface", "#c8c6ce")
                     var colOnSurfaceVar = win.c("on_surface_variant", "#9f9fa9")
                     var colSurface = win.c("surface_container", "#121318")
+                    var tideHeat = ctx.createLinearGradient(0, Y(hi), 0, Y(lo))
+                    tideHeat.addColorStop(0, "#ef4444")
+                    tideHeat.addColorStop(0.5, "#facc15")
+                    tideHeat.addColorStop(1, "#22c55e")
 
                     ctx.fillStyle = win.c("primary_container", win.withAlpha(colAccent, 0.18))
                     ctx.fillRect(L, T, pw, ph)
                     ctx.fillStyle = win.withAlpha(colSurface, 0.55)
                     D.nights.forEach(function (n) {
-                        var a = Math.max(0, Math.min(24, n[0])), b = Math.max(0, Math.min(24, n[1]))
+                        var a = Math.max(0, Math.min(span, n[0])), b = Math.max(0, Math.min(span, n[1]))
                         if (b <= a) return
                         var x1 = X(a), x2 = X(b)
                         ctx.fillRect(Math.min(x1, x2), T, Math.abs(x2 - x1), ph)
                     })
 
-                    ctx.font = "12px monospace"
-                    ctx.textAlign = "center"
-                    ctx.lineWidth = 1
-                    for (var h = 0; h <= 24; h += 2) {
-                        var gx = X(h), hh = h % 24
-                        ctx.strokeStyle = win.withAlpha(colOnSurfaceVar, 0.35)
-                        ctx.beginPath(); ctx.moveTo(gx, T); ctx.lineTo(gx, T + ph); ctx.stroke()
-                        ctx.fillStyle = colOnSurfaceVar
-                        ctx.fillText((hh < 10 ? "0" : "") + hh + ":00", gx, T - 8)
-                    }
+                    win.paintTimeGrid(ctx, X, T, ph, span, win.overview ? D.days : null, colOnSurfaceVar, colOnSurfaceVar)
 
                     ctx.textAlign = "right"
                     for (var m = Math.ceil(lo); m <= hi; m++) {
@@ -641,10 +699,10 @@ FloatingWindow {
                     ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
                     ctx.beginPath(); trace()
                     ctx.lineTo(pts[pts.length - 1].x, T + ph); ctx.lineTo(pts[0].x, T + ph); ctx.closePath()
-                    ctx.fillStyle = win.withAlpha(colAccent, 0.25); ctx.fill()
+                    ctx.globalAlpha = 0.18; ctx.fillStyle = tideHeat; ctx.fill(); ctx.globalAlpha = 1
                     ctx.beginPath(); trace()
                     ctx.lineJoin = "round"; ctx.lineCap = "round"
-                    ctx.strokeStyle = colAccent; ctx.lineWidth = 3; ctx.stroke()
+                    ctx.strokeStyle = tideHeat; ctx.lineWidth = 3; ctx.stroke()
                     ctx.restore()
 
                     if (D.now >= 0 && D.now <= 24) {
@@ -656,10 +714,11 @@ FloatingWindow {
                     }
 
                     D.extrema.forEach(function (e) {
-                        if (e.h < 0 || e.h > 24) return
+                        if (e.h < 0 || e.h > span) return
                         var ex = X(e.h), ey = Y(e.v)
                         ctx.fillStyle = colAccent
                         ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI * 2); ctx.fill()
+                        if (win.overview) return
                         var t = (e.type === "high" ? "H " : "L ") + e.time + "  " + e.v.toFixed(2) + "m"
                         ctx.font = "12px monospace"; ctx.textAlign = "center"
                         var w = ctx.measureText(t).width + 12
