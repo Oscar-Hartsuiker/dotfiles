@@ -12,6 +12,13 @@ TZ = ZoneInfo("Africa/Johannesburg")
 CACHE = Path.home() / ".cache" / "surf" / "waves_gfswave.json"
 TTL = 1800
 
+
+def cache_updated():
+    try:
+        return datetime.fromtimestamp(CACHE.stat().st_mtime, TZ).isoformat(timespec="minutes")
+    except Exception:
+        return None
+
 URL = "https://marine-api.open-meteo.com/v1/marine?" + urllib.parse.urlencode(
     {
         "latitude": LAT,
@@ -117,6 +124,7 @@ def build(data, off):
     pk = max(points, key=lambda p: p[1])
     return {
         "station": STATION,
+        "updated": cache_updated(),
         "label": day.strftime("%a %d %b"),
         "unit": "m",
         "current": round(cur, 2),

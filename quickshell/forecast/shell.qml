@@ -69,6 +69,15 @@ FloatingWindow {
     property int dayOffset: 0
     property double lastShift: 0
     property bool overview: false
+    function updatedTime() {
+        var D = mainData()
+        if (!D || !D.updated) return null
+        var d = new Date(D.updated)
+        return isNaN(d.getTime()) ? null : d
+    }
+    property string updatedText: updatedTime()
+        ? "UPDATED " + Qt.formatDateTime(updatedTime(), "dd MMM HH:mm")
+        : "UPDATED --"
 
     Process {
         id: windProc
@@ -110,34 +119,59 @@ FloatingWindow {
         onTriggered: { windProc.running = true; swellProc.running = true; tideProc.running = true }
     }
 
+    function refresh() {
+        windProc.running = false
+        swellProc.running = false
+        tideProc.running = false
+        restart.start()
+    }
     function shift(n) {
         if (overview) return
         var o = Math.max(0, Math.min(9, dayOffset + n))
         if (o === dayOffset) return
         dayOffset = o
-        windProc.running = false
-        swellProc.running = false
-        tideProc.running = false
-        restart.start()
+        refresh()
     }
     function today() {
         if (overview || dayOffset === 0) return
         dayOffset = 0
-        windProc.running = false
-        swellProc.running = false
-        tideProc.running = false
-        restart.start()
+        refresh()
     }
     function toggleOverview() {
         overview = !overview
-        windProc.running = false
-        swellProc.running = false
-        tideProc.running = false
-        restart.start()
+        refresh()
+    }
+    function gotoDay(i) {
+        var o = Math.max(0, Math.min(9, i))
+        if (!overview && o === dayOffset) return
+        overview = false
+        dayOffset = o
+        refresh()
+    }
+    function handleWheel(e) {
+        var ax = e.angleDelta.x, ay = e.angleDelta.y
+        var dx = ax !== 0 ? ax : e.pixelDelta.x
+        var dy = ay !== 0 ? ay : e.pixelDelta.y
+        if (!dx && !dy) return
+        var horizontal = Math.abs(dx) > Math.abs(dy)
+        if (Date.now() - lastShift < (horizontal ? 333 : 120)) return
+        lastShift = Date.now()
+        if (horizontal) shift(dx > 0 ? -1 : 1)
+        else shift(dy < 0 ? 1 : -1)
     }
 
     readonly property var compass: ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
     function compassOf(deg) { return compass[Math.round(deg / 22.5) % 16] }
+
+    readonly property var shortDays: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+    function dayShort(off) {
+        var d = new Date()
+        d.setDate(d.getDate() + off)
+        return shortDays[d.getDay()] + " " + d.getDate()
+    }
+    function dayAt(x, w) {
+        return Math.max(0, Math.min(9, Math.floor(x / w * 10)))
+    }
 
     function mainData() {
         return dWind || dSwell || dTide
@@ -174,7 +208,7 @@ FloatingWindow {
     function fmtTide(e) { return e ? e.time + "  " + e.v.toFixed(2) + " m" : "--" }
 
     function paintTimeGrid(ctx, X, T, ph, span, days, labelColor, lineColor) {
-        ctx.font = "12px monospace"
+        ctx.font = "10px monospace"
         ctx.textAlign = "center"
         ctx.lineWidth = 1
         if (days && span > 24) {
@@ -213,42 +247,65 @@ FloatingWindow {
         Keys.onPressed: (e) => {
             if (e.key === Qt.Key_Home) win.today()
             else if (e.key === Qt.Key_Space) win.toggleOverview()
+            else if (e.key === Qt.Key_R) win.refresh()
+            else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_9) win.gotoDay(e.key - Qt.Key_1)
+            else if (e.key === Qt.Key_0) win.gotoDay(9)
+        }
+        WheelHandler {
+            orientation: Qt.Horizontal
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: (e) => win.handleWheel(e)
+        }
+        WheelHandler {
+            orientation: Qt.Vertical
+            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+            onWheel: (e) => win.handleWheel(e)
         }
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 24
+            spacing: 36
 
             ColumnLayout {
                 spacing: 0
                 Text {
                     text: "FORECAST"; color: win.c("primary", "#19b5e6")
-                    font.pixelSize: 11; font.letterSpacing: 2; font.bold: true
+                    font.pixelSize: 10; font.letterSpacing: 2; font.bold: true
                 }
                 Text {
                     text: win.mainData() ? win.mainData().station : "--"
-                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true
+                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 16; font.bold: true
                 }
             }
             ColumnLayout {
                 spacing: 0
                 Text {
                     text: "DATE"; color: win.c("on_surface_variant", "#7f8bb3")
-                    font.pixelSize: 11; font.letterSpacing: 1.5
+                    font.pixelSize: 10; font.letterSpacing: 1.5
                 }
                 Text {
                     text: win.mainData()
                         ? (win.overview ? win.mainData().label
                                         : win.mainData().label + (win.dayOffset === 0 ? "  · today" : ""))
                         : "--"
-                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true
+                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 16; font.bold: true
                 }
             }
             Item { Layout.fillWidth: true }
-            Text {
-                text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 10-day")
-                color: win.c("on_surface_variant", "#7f8bb3")
-                font.pixelSize: 11
+            ColumnLayout {
+                spacing: 0
+                Text {
+                    Layout.alignment: Qt.AlignRight
+                    text: win.updatedText
+                    color: win.c("on_surface_variant", "#7f8bb3")
+                    font.pixelSize: 10; font.letterSpacing: 1
+                }
+                Text {
+                    Layout.alignment: Qt.AlignRight
+                    text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 10-day")
+                    color: win.c("on_surface_variant", "#7f8bb3")
+                    font.pixelSize: 10
+                }
             }
         }
 
@@ -260,10 +317,11 @@ FloatingWindow {
 
             RowLayout {
                 Layout.fillWidth: true
+                spacing: 20
                 Text {
                     text: "WIND"; Layout.preferredWidth: 76
                     color: win.c("primary", "#19b5e6")
-                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                    font.pixelSize: 11; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
                     model: win.dWind ? (win.overview ? [
@@ -281,8 +339,8 @@ FloatingWindow {
                     ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
-                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 10; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 14; font.bold: true }
                     }
                 }
             }
@@ -295,14 +353,6 @@ FloatingWindow {
                 Connections { target: win; function onDmsChanged() { windCv.requestPaint() } }
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
-
-                WheelHandler {
-                    onWheel: (e) => {
-                        if (Date.now() - win.lastShift < 120) return
-                        win.lastShift = Date.now()
-                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
-                    }
-                }
                 TapHandler { onDoubleTapped: win.today() }
 
                 onPaint: {
@@ -400,7 +450,7 @@ FloatingWindow {
                         ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
                     }
 
-                    ctx.font = "11px monospace"; ctx.textAlign = "right"
+                    ctx.font = "10px monospace"; ctx.textAlign = "right"
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— wind", L + pw - 70, T + 14)
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("- - gust", L + pw - 6, T + 14)
                 }
@@ -415,10 +465,11 @@ FloatingWindow {
 
             RowLayout {
                 Layout.fillWidth: true
+                spacing: 20
                 Text {
                     text: "SWELL"; Layout.preferredWidth: 76
                     color: win.c("primary", "#19b5e6")
-                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                    font.pixelSize: 11; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
                     model: win.dSwell ? (win.overview ? [
@@ -438,8 +489,8 @@ FloatingWindow {
                     ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
-                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 10; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 14; font.bold: true }
                     }
                 }
             }
@@ -452,14 +503,6 @@ FloatingWindow {
                 Connections { target: win; function onDmsChanged() { swellCv.requestPaint() } }
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
-
-                WheelHandler {
-                    onWheel: (e) => {
-                        if (Date.now() - win.lastShift < 120) return
-                        win.lastShift = Date.now()
-                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
-                    }
-                }
                 TapHandler { onDoubleTapped: win.today() }
 
                 onPaint: {
@@ -549,7 +592,7 @@ FloatingWindow {
                     ctx.setLineDash([])
                     ctx.restore()
 
-                    ctx.font = "bold 11px monospace"; ctx.textAlign = "center"
+                    ctx.font = "bold 10px monospace"; ctx.textAlign = "center"
                     D.periods.forEach(function (e, i) {
                         if (win.overview ? (e[0] % 24 !== 12) : (e[0] % 2 !== 0)) return
                         if (!pp[i]) return
@@ -579,7 +622,7 @@ FloatingWindow {
                         ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke()
                     }
 
-                    ctx.font = "11px monospace"; ctx.textAlign = "right"
+                    ctx.font = "10px monospace"; ctx.textAlign = "right"
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— height", L + pw - 76, T + 14)
                     ctx.fillStyle = colPeriod; ctx.fillText("- - period", L + pw - 6, T + 14)
                 }
@@ -594,10 +637,11 @@ FloatingWindow {
 
             RowLayout {
                 Layout.fillWidth: true
+                spacing: 20
                 Text {
                     text: "TIDE"; Layout.preferredWidth: 76
                     color: win.c("primary", "#19b5e6")
-                    font.pixelSize: 13; font.letterSpacing: 2; font.bold: true
+                    font.pixelSize: 10; font.letterSpacing: 2; font.bold: true
                 }
                 Repeater {
                     model: win.dTide ? (win.overview ? [
@@ -616,8 +660,8 @@ FloatingWindow {
                     ]) : []
                     delegate: ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 11; font.letterSpacing: 1.5 }
-                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 20; font.bold: true }
+                        Text { text: modelData.k; color: win.c("on_surface_variant", "#7f8bb3"); font.pixelSize: 10; font.letterSpacing: 1.5 }
+                        Text { text: modelData.v; color: win.c("on_surface", "#e6ebff"); font.pixelSize: 14; font.bold: true }
                     }
                 }
             }
@@ -630,14 +674,6 @@ FloatingWindow {
                 Connections { target: win; function onDmsChanged() { tideCv.requestPaint() } }
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
-
-                WheelHandler {
-                    onWheel: (e) => {
-                        if (Date.now() - win.lastShift < 120) return
-                        win.lastShift = Date.now()
-                        win.shift(e.angleDelta.y < 0 ? 1 : -1)
-                    }
-                }
                 TapHandler { onDoubleTapped: win.today() }
 
                 onPaint: {
@@ -720,7 +756,7 @@ FloatingWindow {
                         ctx.beginPath(); ctx.arc(ex, ey, 4, 0, Math.PI * 2); ctx.fill()
                         if (win.overview) return
                         var t = (e.type === "high" ? "H " : "L ") + e.time + "  " + e.v.toFixed(2) + "m"
-                        ctx.font = "12px monospace"; ctx.textAlign = "center"
+                        ctx.font = "10px monospace"; ctx.textAlign = "center"
                         var w = ctx.measureText(t).width + 12
                         var bx = Math.max(L + w / 2, Math.min(L + pw - w / 2, ex))
                         var by = e.type === "high" ? ey - 30 : ey + 12
@@ -730,6 +766,51 @@ FloatingWindow {
                         ctx.fillText(t, bx, by + 14)
                     })
                 }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 20
+
+            RowLayout {
+                anchors.fill: parent
+                spacing: 3
+
+                Repeater {
+                    model: 10
+                    delegate: Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 0
+                            color: win.overview
+                                ? win.withAlpha(win.c("primary", "#19b5e6"), 0.28)
+                                : (index === win.dayOffset
+                                    ? win.c("primary", "#19b5e6")
+                                    : win.withAlpha(win.c("on_surface_variant", "#9f9fa9"), 0.16))
+                        }
+                        Text {
+                            anchors.centerIn: parent
+                            text: win.dayShort(index)
+                            color: (!win.overview && index === win.dayOffset)
+                                ? win.c("on_primary", "#0e1220")
+                                : win.c("on_surface_variant", "#9f9fa9")
+                            font.pixelSize: 14
+                            font.letterSpacing: 0.3
+                        }
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton
+                onPressed: (mouse) => win.gotoDay(win.dayAt(mouse.x, width))
+                onPositionChanged: (mouse) => { if (pressed) win.gotoDay(win.dayAt(mouse.x, width)) }
+                onWheel: (wheel) => { win.handleWheel(wheel); wheel.accepted = true }
             }
         }
     }

@@ -12,6 +12,13 @@ TZ = ZoneInfo("Africa/Johannesburg")
 CACHE = Path.home() / ".cache" / "surf" / "wind_gfs.json"
 TTL = 1800  # seconds
 
+
+def cache_updated():
+    try:
+        return datetime.fromtimestamp(CACHE.stat().st_mtime, TZ).isoformat(timespec="minutes")
+    except Exception:
+        return None
+
 URL = "https://api.open-meteo.com/v1/gfs?" + urllib.parse.urlencode(
     {
         "latitude": LAT,
@@ -116,6 +123,7 @@ def build(data, off):
     peak = max(gusts, key=lambda p: p[1])
     return {
         "station": STATION,
+        "updated": cache_updated(),
         "label": day.strftime("%a %d %b"),
         "unit": "kn",
         "current": round(cur, 1),

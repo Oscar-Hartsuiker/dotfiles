@@ -43,6 +43,15 @@ def load():
 
 
 data = load()
+
+
+def updated():
+    try:
+        return datetime.fromtimestamp(data["t"], ZoneInfo(TZ)).isoformat(timespec="minutes")
+    except Exception:
+        return None
+
+
 P = datetime.fromisoformat
 now = datetime.now(ZoneInfo(TZ)).replace(tzinfo=None)
 start0 = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -139,6 +148,7 @@ def build(offset):
 
     return {
         "station": STATION,
+        "updated": updated(),
         "now": round(hn, 3),
         "current": round(fit(hn), 3),
         "rising": fit(hn + 0.25) > fit(hn),
