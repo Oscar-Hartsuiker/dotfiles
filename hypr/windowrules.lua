@@ -27,7 +27,9 @@ hl.workspace_rule({
 -- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
 hl.config({
 	dwindle = {
-		preserve_split = true, -- You probably want this
+		force_split = 2,
+		preserve_split = true,
+		use_active_for_splits = true,
 	},
 })
 
@@ -68,7 +70,7 @@ hl.window_rule({
 	match = { workspace = "special:󰟠" },
 	--float = true,
 	size = { 1000, 700 },
-	opacity = 0.8,
+	opacity = 0.85,
 	--rounding = 8,
 })
 --hl.workspace_rule({ workspace = "4", layout = "scrolling" })

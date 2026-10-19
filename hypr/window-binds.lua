@@ -13,7 +13,7 @@ end)
 
 --- FLOAT WINDOW
 ---
-hl.bind(mainMod .. " + v ", function()
+hl.bind(mainMod .. " + d ", function()
 	local w = hl.get_active_window()
 	local was_floating = w ~= nil and w.floating
 	hl.dispatch(hl.dsp.window.float({ action = "toggle" }))

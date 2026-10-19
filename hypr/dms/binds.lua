@@ -4,7 +4,7 @@
 hl.bind("SUPER + T", hl.dsp.exec_cmd("ghostty"))
 hl.bind("SUPER + space", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
 hl.bind("ALT + space", hl.dsp.exec_cmd("dms ipc call spotlight-bar toggle"))
-hl.bind("SUPER + c", hl.dsp.exec_cmd("dms ipc call clipboard toggle"))
+hl.bind("SUPER + SHIFT + c", hl.dsp.exec_cmd("dms ipc call clipboard toggle"))
 hl.bind("SUPER + p", hl.dsp.exec_cmd("dms ipc call processlist focusOrToggle"))
 hl.bind("SUPER + insert", hl.dsp.exec_cmd("dms ipc call settings focusOrToggle"))
 hl.bind("SUPER + N", hl.dsp.exec_cmd("dms ipc call notifications toggle"))

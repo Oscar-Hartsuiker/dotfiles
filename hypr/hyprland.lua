@@ -3,6 +3,7 @@ require("windowrules")
 require("window-binds")
 require("dms-theme-sync")
 require("gestures")
+require("binds-clipboard")
 require("titlebars")
 --require("hyprexpo")
 hl.config({

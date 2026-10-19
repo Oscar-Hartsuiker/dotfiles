@@ -201,7 +201,7 @@ hl.bind(mainMod .. " + bracketleft", hl.dsp.group.prev())
 
 --- FLOAT WINDOW
 ---
-hl.bind(mainMod .. " + v ", function()
+hl.bind(mainMod .. " + d ", function()
 	local w = hl.get_active_window()
 	local was_floating = w ~= nil and w.floating
 	hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
@@ -211,3 +211,31 @@ hl.bind(mainMod .. " + v ", function()
 end)
 
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("~/.local/bin/hyprcurve"))
+
+-- Define a helper function to determine if the active window is a terminal
+local function send_shortcut_by_context(term_keys, regular_keys)
+	-- Execute hyprctl to fetch the active window class
+	local handle = io.popen("hyprctl activewindow")
+	if not handle then
+		return
+	end
+	local result = handle:read("*a")
+	handle:close()
+
+	-- Check if the active window matches standard terminal emulators
+	if string.match(result, "class:.*(foot|kitty|alacritty|ghostty|wezterm)") then
+		os.execute("hyprctl dispatch sendshortcut " .. term_keys .. ",activewindow")
+	else
+		os.execute("hyprctl dispatch sendshortcut " .. regular_keys .. ",activewindow")
+	end
+end
+
+-- Global Copy (SUPER + C)
+hl.bind("SUPER + C", function()
+	send_shortcut_by_context("CTRL_SHIFT + C", "CTRL + C")
+end)
+
+-- Global Paste (SUPER + V)
+hl.bind("SUPER + V", function()
+	send_shortcut_by_context("CTRL_SHIFT + V", "CTRL + V")
+end)

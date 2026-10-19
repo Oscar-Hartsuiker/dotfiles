@@ -6,7 +6,7 @@ function M.add_entry()
   local month = os.date("%B")
   local date = os.date("%Y-%m-%d")
   local weekday = os.date("%A")
-  local time = os.date("%I:%M %p")
+  local time = os.date("%H:%M")
 
   local entry_header = "#### " .. time .. " - "
 

@@ -6,8 +6,8 @@ local programs = {
 	--fileManager = "nautilus --new-window",
 	fileManager = "dolphin",
 	menu = "rofi -show combi -combi-modi window,drun,run,fileManage",
-	browser2 = "firefox",
-	browser = "helium",
+	browser = "firefox",
+	browser2 = "helium",
 	whatsapp = "zapzap",
 	yazi = "yazi",
 }
