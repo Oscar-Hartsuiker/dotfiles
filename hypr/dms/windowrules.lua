@@ -12,3 +12,6 @@ hl.window_rule({ match = { class = "^Ardour-8.12.0~ds$", title = "^* input$" }, 
 
 -- DMS-RULE: id=wr_1791746799455448377, name=xdg-desktop-portal-gtk
 hl.window_rule({ match = { class = "^xdg-desktop-portal-gtk*" }, size = { 800, 600 } })
+
+-- DMS-RULE: id=wr_1792487512052926429, name=xdg-desktop-portal-gtk
+hl.window_rule({ match = { class = "^xdg-desktop-portal-gtk$" }, float = true })

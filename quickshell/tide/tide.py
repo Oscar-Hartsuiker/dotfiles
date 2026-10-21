@@ -1,14 +1,56 @@
 #!/usr/bin/env python3
-import json, time, urllib.request, sys
+import configparser, json, os, time, urllib.request, sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-STATION = "Cape St Francis"
-LAT, LON = -34.25, 24.90  # keep this OFFSHORE: land grid cells return null
-TZ = "Africa/Johannesburg"
-# CACHE = Path.home() / ".cache/tide.json"
-CACHE = Path.home() / ".cache/tide2.json"
+
+def load_config():
+    path = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "quickshell" / "forecast" / "forecast.conf"
+    cfg = configparser.ConfigParser()
+    try:
+        cfg.read(path)
+    except Exception:
+        pass
+    return cfg
+
+
+def conf_str(section, key, fallback):
+    try:
+        value = CFG.get(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        value = value[1:-1]
+    return value
+
+
+def conf_float(section, key, fallback):
+    try:
+        return CFG.getfloat(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+
+
+def conf_int(section, key, fallback):
+    try:
+        return CFG.getint(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+
+
+CFG = load_config()
+STATION = conf_str("location", "name", "Cape St Francis")
+LAT = conf_float("location", "tide_latitude", conf_float("location", "latitude", -34.25))
+LON = conf_float("location", "tide_longitude", conf_float("location", "longitude", 24.90))
+TZ = conf_str("location", "timezone", "Africa/Johannesburg")
+try:
+    ZoneInfo(TZ)
+except Exception:
+    TZ = "Africa/Johannesburg"
+DAYS = max(1, min(10, conf_int("forecast", "days", 7)))
+MODEL = "SMOC Tides 0.08°"
+CACHE = Path.home() / ".cache" / f"tide2_{LAT:g}_{LON:g}.json"
 MAX_AGE = 3 * 3600
 
 
@@ -170,6 +212,7 @@ def build(offset):
 
     return {
         "station": STATION,
+        "model": MODEL,
         "updated": updated(),
         "yearLo": YEAR_LO,
         "yearHi": YEAR_HI,
@@ -200,7 +243,7 @@ def combine(days):
     out = dict(days[0])
     out.update(
         {
-            "label": "7-day",
+            "label": f"{DAYS}-day",
             "span": pts[-1][0],
             "points": pts,
             "extrema": ext_all,
@@ -213,7 +256,7 @@ def combine(days):
 
 def main():
     args = sys.argv[1:]
-    offsets = range(7)
+    offsets = range(DAYS)
     if args and args[0] == "all":
         print(json.dumps(combine([build(off) for off in offsets])))
     else:

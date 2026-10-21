@@ -1,15 +1,59 @@
 #!/usr/bin/env python3
 """wind.py [dayOffset|all] -> JSON for the wind chart (GFS via Open-Meteo, knots)."""
 
-import json, math, sys, time, urllib.parse, urllib.request
+import configparser, json, math, os, sys, time, urllib.parse, urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-STATION = "Cape St Francis"
-LAT, LON = -34.21, 24.84
-TZ = ZoneInfo("Africa/Johannesburg")
-CACHE = Path.home() / ".cache" / "surf" / "wind_gfs.json"
+
+def load_config():
+    path = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "quickshell" / "forecast" / "forecast.conf"
+    cfg = configparser.ConfigParser()
+    try:
+        cfg.read(path)
+    except Exception:
+        pass
+    return cfg
+
+
+def conf_str(section, key, fallback):
+    try:
+        value = CFG.get(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        value = value[1:-1]
+    return value
+
+
+def conf_float(section, key, fallback):
+    try:
+        return CFG.getfloat(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+
+
+def conf_int(section, key, fallback):
+    try:
+        return CFG.getint(section, key, fallback=fallback)
+    except Exception:
+        return fallback
+
+
+CFG = load_config()
+STATION = conf_str("location", "name", "Cape St Francis")
+LAT = conf_float("location", "latitude", -34.21)
+LON = conf_float("location", "longitude", 24.84)
+TZ_NAME = conf_str("location", "timezone", "Africa/Johannesburg")
+try:
+    TZ = ZoneInfo(TZ_NAME)
+except Exception:
+    TZ_NAME = "Africa/Johannesburg"
+    TZ = ZoneInfo(TZ_NAME)
+DAYS = max(1, min(10, conf_int("forecast", "days", 7)))
+MODEL = "GFS"
+CACHE = Path.home() / ".cache" / "surf" / f"wind_gfs_{LAT:g}_{LON:g}.json"
 TTL = 1800  # seconds
 
 
@@ -25,7 +69,7 @@ URL = "https://api.open-meteo.com/v1/gfs?" + urllib.parse.urlencode(
         "longitude": LON,
         "hourly": "wind_speed_10m,wind_direction_10m,wind_gusts_10m",
         "wind_speed_unit": "kn",
-        "timezone": "Africa/Johannesburg",
+        "timezone": TZ_NAME,
         "forecast_days": 11,
     }
 )
@@ -123,6 +167,7 @@ def build(data, off):
     peak = max(gusts, key=lambda p: p[1])
     return {
         "station": STATION,
+        "model": MODEL,
         "updated": cache_updated(),
         "label": day.strftime("%a %d %b"),
         "unit": "kn",
@@ -153,7 +198,7 @@ def combine(days):
     out = dict(days[0])
     out.update(
         {
-            "label": "7-day",
+            "label": f"{DAYS}-day",
             "span": pts[-1][0],
             "points": pts,
             "gusts": gusts,
@@ -170,7 +215,7 @@ def main():
     args = sys.argv[1:]
     data = fetch()
     if args and args[0] == "all":
-        print(json.dumps(combine([build(data, off) for off in range(7)])))
+        print(json.dumps(combine([build(data, off) for off in range(DAYS)])))
     else:
         off = int(args[0]) if args else 0
         print(json.dumps(build(data, off)))

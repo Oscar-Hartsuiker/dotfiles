@@ -16,6 +16,11 @@ FloatingWindow {
 
     property var dms: null
     property string dmsRaw: ""
+    property var conf: ({})
+    property string confRaw: ""
+    property int locationTextSize: 18
+    property real windMaxDefault: 40
+    property real swellMaxDefault: 5
     function c(name, fallback) {
         var m = dms && dms.colors
         var set = m ? (m[dms.mode] || m.dark) : null
@@ -50,6 +55,18 @@ FloatingWindow {
         onFileChanged: win.loadDms()
         onLoadFailed: console.log("forecast: dms-colors.json missing, using fallback colours")
     }
+    FileView {
+        id: forecastConf
+        path: Quickshell.shellDir + "/forecast.conf"
+        watchChanges: false
+        blockLoading: false
+        onLoadFailed: console.log("forecast: forecast.conf missing, using defaults")
+    }
+    Timer {
+        interval: 2000; running: true; repeat: true; triggeredOnStart: true
+        onTriggered: { forecastConf.reload(); confApply.start() }
+    }
+    Timer { id: confApply; interval: 80; onTriggered: win.loadConf() }
     Timer {
         interval: 1500; running: true; repeat: true; triggeredOnStart: true
         onTriggered: { dmsColors.reload(); dmsApply.start() }
@@ -63,6 +80,51 @@ FloatingWindow {
             dmsRaw = t
             dms = JSON.parse(t)
         } catch (e) { console.log("forecast: bad dms colours:", e) }
+    }
+
+    function parseConf(text) {
+        var out = {}
+        var section = "default"
+        out[section] = {}
+        var lines = String(text).split(/\r?\n/)
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim()
+            if (!line || line.charAt(0) === "#" || line.charAt(0) === ";") continue
+            if (line.charAt(0) === "[" && line.charAt(line.length - 1) === "]") {
+                section = line.slice(1, -1).trim()
+                if (!out[section]) out[section] = {}
+                continue
+            }
+            var eq = line.indexOf("=")
+            if (eq < 0) continue
+            var key = line.slice(0, eq).trim()
+            var val = line.slice(eq + 1).trim()
+            if (val.length >= 2 && ((val.charAt(0) === '"' && val.charAt(val.length - 1) === '"') ||
+                                    (val.charAt(0) === "'" && val.charAt(val.length - 1) === "'")))
+                val = val.slice(1, -1)
+            out[section][key] = val
+        }
+        return out
+    }
+
+    function confNumber(section, key, fallback) {
+        var s = conf && conf[section]
+        var v = s && s[key] !== undefined ? Number(s[key]) : NaN
+        return isNaN(v) ? fallback : v
+    }
+
+    function loadConf() {
+        var text = forecastConf.text()
+        if (!text || text === confRaw) return
+        var first = confRaw === ""
+        confRaw = text
+        conf = parseConf(text)
+        win.dayCount = Math.max(1, Math.min(10, Math.round(confNumber("forecast", "days", 7))))
+        if (win.dayOffset > win.dayCount - 1) win.dayOffset = win.dayCount - 1
+        win.locationTextSize = Math.max(8, Math.min(48, Math.round(confNumber("display", "location_text_size", 18))))
+        win.windMaxDefault = Math.max(5, Math.min(100, confNumber("graphs", "wind_max", 40)))
+        win.swellMaxDefault = Math.max(1, Math.min(20, confNumber("graphs", "swell_max", 5)))
+        if (!first) win.refresh()
     }
 
     property bool rtl: false
@@ -250,6 +312,17 @@ FloatingWindow {
         }
     }
 
+    function paintModel(ctx, D, L, T, pw, ph, color) {
+        if (!D || !D.model) return
+        ctx.save()
+        ctx.font = "8px monospace"
+        ctx.textAlign = "right"
+        ctx.textBaseline = "alphabetic"
+        ctx.fillStyle = win.withAlpha(color, 0.8)
+        ctx.fillText(D.model, L + pw - 6, T + ph - 6)
+        ctx.restore()
+    }
+
     function nearestIdx(arr, h) {
         if (!arr || !arr.length) return -1
         var lo = 0, hi = arr.length - 1
@@ -413,7 +486,9 @@ FloatingWindow {
             else if (e.key === Qt.Key_J) win.moveTooltipGraph(1)
             else if (e.key === Qt.Key_K) win.moveTooltipGraph(-1)
             else if (e.key === Qt.Key_N) win.shift((e.modifiers & Qt.ShiftModifier) ? -1 : 1)
-            else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_7) win.gotoDay(e.key - Qt.Key_1)
+            else if (e.key === Qt.Key_B) win.shift(-1)
+            else if (e.key >= Qt.Key_1 && e.key <= Qt.Key_9 && (e.key - Qt.Key_1) < win.dayCount) win.gotoDay(e.key - Qt.Key_1)
+            else if (e.key === Qt.Key_0 && win.dayCount > 9) win.gotoDay(9)
         }
         WheelHandler {
             orientation: Qt.Horizontal
@@ -438,7 +513,7 @@ FloatingWindow {
                 }
                 Text {
                     text: win.mainData() ? win.mainData().station : "--"
-                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: 18; font.bold: true
+                    color: win.c("on_surface", "#e6ebff"); font.pixelSize: win.locationTextSize; font.bold: true
                 }
             }
             ColumnLayout {
@@ -466,7 +541,7 @@ FloatingWindow {
                 }
                 Text {
                     Layout.alignment: Qt.AlignRight
-                    text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = 7-day") + "  ·  / = keys"
+                    text: "← → / scroll  ·  Home = today  ·  " + (win.overview ? "Space = single day" : "Space = " + win.dayCount + "-day") + "  ·  / = keys"
                     color: win.c("on_surface_variant", "#7f8bb3")
                     font.pixelSize: 12
                 }
@@ -535,6 +610,7 @@ FloatingWindow {
                     function onTooltipOnChanged() { windCv.requestPaint() }
                     function onTooltipGraphChanged() { windCv.requestPaint() }
                     function onTooltipHourChanged() { windCv.requestPaint() }
+                    function onWindMaxDefaultChanged() { windCv.requestPaint() }
                 }
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
@@ -550,7 +626,8 @@ FloatingWindow {
                     var span = (win.overview && D.span) ? D.span : 24
                     var maxV = Math.max.apply(null, D.gusts.map(function (p) { return p[1] }))
                     var lo = 0
-                    var hi = Math.max(40, Math.ceil(maxV / 5) * 5)
+                    var defaultTop = Math.max(5, Math.ceil(win.windMaxDefault / 5) * 5)
+                    var hi = Math.max(defaultTop, Math.ceil(maxV / 5) * 5)
                     function X(h) { var f = h / span; if (win.rtl) f = 1 - f; return L + f * pw }
                     function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * ph }
 
@@ -585,17 +662,22 @@ FloatingWindow {
                         for (var i = 0; i < pts.length - 1; i++) {
                             var p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1]
                             var p3 = pts[Math.min(i + 2, pts.length - 1)]
-                            ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
-                                              p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+                            ctx.bezierCurveTo(p1.x + (p2.x - p0.x) / 12, p1.y + (p2.y - p0.y) / 12,
+                                              p2.x - (p3.x - p1.x) / 12, p2.y - (p3.y - p1.y) / 12,
                                               p2.x, p2.y)
                         }
+                    }
+                    function traceGust(pts) {
+                        ctx.moveTo(pts[0].x, pts[0].y)
+                        for (var i = 1; i < pts.length; i++)
+                            ctx.lineTo(pts[i].x, pts[i].y)
                     }
                     var sp = mkPts(D.points), gp = mkPts(D.gusts)
 
                     ctx.save()
                     ctx.beginPath(); ctx.rect(L, T, pw, ph); ctx.clip()
 
-                    ctx.beginPath(); trace(gp)
+                    ctx.beginPath(); traceGust(gp)
                     ctx.setLineDash([6, 5])
                     ctx.lineJoin = "round"; ctx.lineCap = "round"
                     ctx.strokeStyle = windHeat; ctx.lineWidth = 2; ctx.stroke()
@@ -645,6 +727,7 @@ FloatingWindow {
                     ctx.textAlign = "right"
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— wind", L + pw - 70, T + 14)
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("- - gust", L + pw - 6, T + 14)
+                    win.paintModel(ctx, D, L, T, pw, ph, colOnSurfaceVar)
 
                     if (win.tooltipOn && win.tooltipGraph === 0) {
                         var hour = Math.max(0, Math.min(span, win.tooltipHour))
@@ -743,6 +826,7 @@ FloatingWindow {
                     function onTooltipOnChanged() { swellCv.requestPaint() }
                     function onTooltipGraphChanged() { swellCv.requestPaint() }
                     function onTooltipHourChanged() { swellCv.requestPaint() }
+                    function onSwellMaxDefaultChanged() { swellCv.requestPaint() }
                 }
                 onWidthChanged: requestPaint()
                 onHeightChanged: requestPaint()
@@ -760,7 +844,8 @@ FloatingWindow {
                     var maxV = Math.max.apply(null, D.points.map(function (p) { return p[1] }))
                     var step = 1
                     var lo = 0
-                    var hi = Math.max(5, Math.ceil(maxV / step) * step)
+                    var defaultTop = Math.max(1, Math.ceil(win.swellMaxDefault / step) * step)
+                    var hi = Math.max(defaultTop, Math.ceil(maxV / step) * step)
 
                     var pv = D.periods.map(function (p) { return p[1] })
                     var pLo = Math.max(0, Math.floor((Math.min.apply(null, pv) - 2) / 2) * 2)
@@ -870,6 +955,7 @@ FloatingWindow {
                     ctx.textAlign = "right"
                     ctx.fillStyle = colOnSurfaceVar; ctx.fillText("— height", L + pw - 76, T + 14)
                     ctx.fillStyle = colPeriod; ctx.fillText("- - period", L + pw - 6, T + 14)
+                    win.paintModel(ctx, D, L, T, pw, ph, colOnSurfaceVar)
 
                     if (win.tooltipOn && win.tooltipGraph === 1) {
                         var hour = Math.max(0, Math.min(span, win.tooltipHour))
@@ -1128,6 +1214,8 @@ FloatingWindow {
                         ctx.fillText(t, bx, by + 14)
                     })
 
+                    win.paintModel(ctx, D, L, T, pw, ph, colOnSurfaceVar)
+
                     if (win.tooltipOn && win.tooltipGraph === 2) {
                         var hour = Math.max(0, Math.min(span, win.tooltipHour))
                         var di = win.nearestIdx(D.points, hour)
@@ -1264,11 +1352,12 @@ FloatingWindow {
                     model: [
                         { k: "← / → / scroll", d: "previous / next day" },
                         { k: "n / N", d: "next / previous day" },
+                        { k: "b", d: "previous day" },
                         { k: "gg / G", d: "first / last day" },
                         { k: "Home", d: "jump to today" },
-                        { k: "Space", d: "toggle 7-day overview" },
+                        { k: "Space", d: "toggle " + win.dayCount + "-day overview" },
                         { k: "Tab / ⇧Tab", d: "cycle wind / swell / tide / all" },
-                        { k: "1–7", d: "jump to day 1–7" },
+                        { k: "1–" + win.dayCount, d: "jump to day 1–" + win.dayCount },
                         { k: "left click", d: "show tooltip at cursor" },
                         { k: "right click", d: "hide tooltip" },
                         { k: "i", d: "toggle tooltip" },
