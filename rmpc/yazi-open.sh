@@ -9,4 +9,4 @@ FILE=$(echo "$SONG_PATH" | head -n1)
 # Get the folder containing the track
 DIR=$(dirname "$MUSIC_DIR/$FILE")
 
-foot -e yazi "$DIR"
+ghostty -e yazi "$DIR"

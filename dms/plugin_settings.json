@@ -1,0 +1,113 @@
+{
+  "dmsThemeSync": {
+    "enabled": true,
+    "folderColorBaseThemeDark": "Papirus-Dark",
+    "folderColorBaseThemeLight": "",
+    "folderColorBaseTheme": "",
+    "gtkThemeLight": "preserve",
+    "gtkThemeDark": "preserve",
+    "uniformListBg": true,
+    "qtPlatformTheme": "auto",
+    "syncTerminalFonts": true,
+    "syncFolderColor": true,
+    "dimNiriBorder": false,
+    "regularFontSize": 16,
+    "monoFontSize": 16,
+    "documentFontSize": 16,
+    "syncCursorColor": true,
+    "syncKvantum": false,
+    "qtStyle": "preserve",
+    "qtSyncMode": "auto",
+    "backupEnabled": false,
+    "syncKde": true
+  },
+  "hyprLayoutToggle": {
+    "enabled": true
+  },
+  "emojiLauncher": {
+    "enabled": true,
+    "recentEmojis": "󱎘,✔,ℝ,😑,🩷",
+    "pasteOnSelect": true,
+    "trigger": ":i"
+  },
+  "specialWsSwitcher": {
+    "enabled": true
+  },
+  "hiddenBar": {
+    "enabled": false,
+    "usePopout": true,
+    "hideIconPillWhenCollapsed": false,
+    "popoutLayout": "row",
+    "showRegionPreview": false,
+    "autoExpand": true
+  },
+  "commandRunner": {
+    "enabled": true,
+    "terminal": "ghostty",
+    "history": [
+      "quickshell -c wind",
+      "tide-toggle",
+      "asteriods",
+      "mame pacman",
+      "hyprbar-toggle.sh",
+      "killall ardour",
+      "sudo apt install kde",
+      "rmpc",
+      "yazi",
+      "kitty --dropdown",
+      "rez",
+      "killall sushi",
+      "killall nautilus",
+      "sudo apt install qt6ct qt6-style-kvantum kvantum",
+      "reaper"
+    ]
+  },
+  "caffeineRedesigned": {
+    "enabled": false
+  },
+  "dankSoftwareDepot": {
+    "enabled": true,
+    "appimageHandlerClaimed": true,
+    "launcherPromptDone": true,
+    "showRuntimes": true
+  },
+  "niriWindows": {
+    "enabled": false,
+    "noTrigger": true
+  },
+  "obsidianSearch": {
+    "enabled": true
+  },
+  "dankNotepadModule": {
+    "enabled": true,
+    "style": "tokyonight-storm"
+  },
+  "dankMenu": {
+    "enabled": true
+  },
+  "wallpaperCarousel": {
+    "enabled": true,
+    "overlayOpacity": 49,
+    "expandMultiplier": 176,
+    "cacheSize": 30,
+    "itemHeight": 342,
+    "holdExpandRatio": 94,
+    "expandSelected": "false",
+    "itemWidth": 501,
+    "selectedScale": 117,
+    "enableHoldExpand": "false",
+    "holdDelay": 5755,
+    "borderWidth": 1
+  },
+  "emojiPicker": {
+    "enabled": true
+  },
+  "dankHyprlandWindows": {
+    "enabled": true
+  },
+  "calculator": {
+    "enabled": true,
+    "noTrigger": false,
+    "trigger": ""
+  }
+}

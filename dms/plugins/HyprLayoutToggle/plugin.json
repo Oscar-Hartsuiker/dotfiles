@@ -1,0 +1,11 @@
+{
+  "id": "hyprLayoutToggle",
+  "name": "Hyprland Layout Toggle",
+  "description": "Shows the active workspace layout, click to toggle monocle/dwindle",
+  "version": "1.0.0",
+  "author": "Oscar",
+  "icon": "grid_view",
+  "type": "widget",
+  "component": "./LayoutWidget.qml",
+  "permissions": ["process"]
+}

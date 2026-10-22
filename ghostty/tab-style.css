@@ -1,13 +1,29 @@
+/* Slimmer Ghostty header and AdwTabBar. Loaded via gtk-custom-css. */
+
 headerbar {
   min-height: 24px;
   padding: 0;
 }
 
-tab {
-  min-height: 24px;
-  padding: 2px 8px;
+tabbar tabbox {
+  min-height: 20px;
+  padding-top: 3px;
+  padding-bottom: 2px;
 }
 
-tabbox {
+tabbar tab {
+  min-height: 18px;
+  padding: 2px 2px;
+}
+
+tabbar tab button.image-button {
+  min-width: 18px;
+  min-height: 18px;
   padding: 0;
+  margin: 0;
+}
+
+tabbar .start-action,
+tabbar .end-action {
+  padding: 0 0px;
 }

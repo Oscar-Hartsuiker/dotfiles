@@ -1,0 +1,48 @@
+{
+  "lockfileVersion": 1,
+  "plugins": {
+    "caffeineRedesigned": {
+      "repo": "https://github.com/JDKamalakar/DMS-Caffeine",
+      "commit": "8d2e19bc1cde57aa7339b055d2bb385b36e00928"
+    },
+    "calculator": {
+      "repo": "https://github.com/rochacbruno/DankCalculator",
+      "commit": "c9fbbe921e9afeb92f4e92390e9fc05f006f0373"
+    },
+    "commandRunner": {
+      "repo": "https://github.com/devnullvoid/dms-command-runner",
+      "commit": "5c2cab404335ceb96c60cf9e97a9682994209cd4"
+    },
+    "dankKDEConnect": {
+      "repo": "https://github.com/AvengeMedia/dms-plugins",
+      "path": "DankKDEConnect",
+      "commit": "e774a9756f2a50499c37a5513f28bee4ebe81d73"
+    },
+    "dankNotepadModule": {
+      "repo": "https://github.com/AvengeMedia/dms-plugins",
+      "path": "DankNotepadModule",
+      "commit": "e774a9756f2a50499c37a5513f28bee4ebe81d73"
+    },
+    "dmsThemeSync": {
+      "repo": "https://github.com/arqueon/dms-theme-sync",
+      "commit": "090867723a05271d13c492104cf7c4c28028924b"
+    },
+    "emojiLauncher": {
+      "repo": "https://github.com/devnullvoid/dms-emoji-launcher",
+      "commit": "8ff394e3ddfcb2fd755ed2e7b4c6f01f3e26e596"
+    },
+    "emojiPicker": {
+      "repo": "https://github.com/hthienloc/dms-plugins",
+      "path": "emojiPicker",
+      "commit": "0a2976deaaa5fa1315be1a403e3552b8c90929f4"
+    },
+    "niriWindows": {
+      "repo": "https://github.com/rochacbruno/DankNiriWindows",
+      "commit": "411d5ee9f7707029f4c12c824ec3b24ca6756a0d"
+    },
+    "wallpaperCarousel": {
+      "repo": "https://github.com/motor-dev/wallpaperCarousel",
+      "commit": "761ecd1b7f347beee9f17909f8334d987c935a1a"
+    }
+  }
+}

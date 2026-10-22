@@ -106,6 +106,7 @@
             "n":          NextResult,
             "N":          PreviousResult,
             "a":          Add,
+            "<C-a>":      Insert,
             "A":          AddAll,
             "D":          Delete,
             "<C-r>":      Rename,

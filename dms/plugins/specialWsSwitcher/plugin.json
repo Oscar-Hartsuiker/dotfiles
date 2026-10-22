@@ -1,0 +1,16 @@
+{
+    "id": "specialWsSwitcher",
+    "name": "Special Workspace Switcher",
+    "description": "Workspace switcher that includes Hyprland special workspaces",
+    "version": "1.0.0",
+    "author": "user",
+    "type": "widget",
+    "capabilities": ["dankbar-widget", "compositor-integration"],
+    "component": "./SpecialWorkspaceSwitcher.qml",
+    "icon": "view_module",
+    "permissions": ["settings_read"],
+    "compositors": "hyprland",
+    "distro": "any",
+    "dependencies": [],
+    "requires": ">=1.2.0"
+}

@@ -168,7 +168,7 @@ function M:redraw()
 		ui.Clear(self._area),
 		ui.Border(ui.Edge.ALL)
 			:area(self._area)
-			:type(ui.Border.ROUNDED)
+			:type(ui.Border.PLAIN)
 			:style(ui.Style():fg("blue"))
 			:title(ui.Line("Mount"):align(ui.Align.CENTER)),
 		ui.Table(rows)
