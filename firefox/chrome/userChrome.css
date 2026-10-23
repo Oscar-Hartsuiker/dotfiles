@@ -1,12 +1,1 @@
-/* Strip border-radius from the Firefox UI */
-*,
-::before,
-::after,
-.tab-background,
-.searchbar-textbox,
-#urlbar-background,
-#searchbar,
-menupopup,
-panel {
-  border-radius: 0px !important;
-}
+@import url("custom.css");

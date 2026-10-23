@@ -1,6 +1,1 @@
-@-moz-document url-prefix("http://"), url-prefix("https://"), url-prefix("about:")
-{
-  * {
-    border-radius: 0px !important;
-  }
-}
+@import url("custom-content.css");

@@ -29,3 +29,4 @@ keybind = ctrl+shift+l=next_tab
 
 # Tames high-resolution or fast wheel events down to standard line counts
 mouse-scroll-multiplier = precision:0.1,discrete:1
+theme = noctalia
