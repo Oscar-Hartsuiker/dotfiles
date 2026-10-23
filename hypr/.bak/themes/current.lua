@@ -1,1 +1,0 @@
-/home/oscar/.config/hypr/themes/gruvbox-dark.lua
