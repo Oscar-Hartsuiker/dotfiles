@@ -1,4 +1,3 @@
-local home = os.getenv("HOME")
 local runtime = os.getenv("XDG_RUNTIME_DIR") or "/tmp"
 
 -- flag lives in the runtime dir, so it's wiped on logout/reboot
@@ -12,23 +11,13 @@ local function bars_enabled()
 	return false
 end
 
-local function dms_border_colour()
-	local f = io.open(home .. "/.config/hypr/dms/colors.lua", "r")
-	if not f then
-		return nil
-	end
-	local text = f:read("*a")
-	f:close()
-	return text:match('active_border%s*=%s*"(rgb%(%x+%))"')
-end
-
 --hl.on("hyprland.start", function()
 --	hl.exec_cmd("hyprpm reload -n")
 --end)
 
 -- only runs after the toggle script has loaded the plugin
 if bars_enabled() then
-	local bar = dms_border_colour() or "rgb(1a1a1a)"
+	local bar = require("noctalia").colors.primary
 
 	hl.config({
 		plugin = {

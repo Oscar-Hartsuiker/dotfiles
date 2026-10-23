@@ -94,6 +94,7 @@ hl.bind("SUPER + SHIFT + 9", hl.dsp.window.move({ workspace = "9" }))
 
 -- === Sizing & Layout ===
 hl.bind("SUPER + R", hl.dsp.layout("togglesplit"))
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.local/bin/hyprcurve"))
 hl.bind("SUPER + CTRL + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "set" }))
 
 -- === Move/resize windows with mainMod + LMB/RMB and dragging ===
