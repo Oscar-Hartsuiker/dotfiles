@@ -9,6 +9,28 @@
 --     rounding    = 0,
 -- })
 
+hl.window_rule({ match = { class = "^(org\\.wezfurlong\\.wezterm)$" }, tile = true })
+hl.window_rule({ match = { class = "^(org\\.gnome\\.)" }, rounding = 12 })
+hl.window_rule({ match = { class = "^(gnome-control-center)$" }, tile = true })
+hl.window_rule({ match = { class = "^(pavucontrol)$" }, tile = true })
+hl.window_rule({ match = { class = "^(nm-connection-editor)$" }, tile = true })
+hl.window_rule({ match = { class = "^(org\\.gnome\\.Calculator)$" }, float = true })
+hl.window_rule({ match = { class = "^(gnome-calculator)$" }, float = true })
+hl.window_rule({ match = { class = "^(galculator)$" }, float = true })
+hl.window_rule({ match = { class = "^(org\\.gnome\\.Nautilus)$" }, float = false })
+hl.window_rule({ match = { class = "^(xdg-desktop-portal)$" }, float = true })
+hl.window_rule({
+	match = { class = "^(steam)$", title = "^(notificationtoasts)" },
+	no_initial_focus = true,
+	pin = true,
+})
+hl.window_rule({
+	match = { class = "^(firefox)$", title = "^(Picture-in-Picture)$" },
+	float = false,
+})
+hl.window_rule({ match = { class = "^(zoom)$" }, float = true })
+--hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
+
 hl.window_rule({
 	match = { group = true },
 	rounding = 0,
@@ -24,43 +46,6 @@ hl.workspace_rule({
 	gaps_out = 0,
 	gaps_in = 0,
 })
--- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
-hl.config({
-	dwindle = {
-		force_split = 2,
-		preserve_split = true,
-		use_active_for_splits = true,
-	},
-})
-
--- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
-hl.config({
-	master = {
-		new_status = "slave",
-		mfact = 0.5,
-		allow_small_split = true,
-		special_scale_factor = 2,
-	},
-})
-
--- See https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/ for more
-hl.config({
-	scrolling = {
-		fullscreen_on_one_column = true,
-	},
-})
-
-----------------
-----  MISC  ----
-----------------
-
-hl.config({
-	misc = {
-		force_default_wallpaper = 2, -- Set to 0 or 1 to disable the anime mascot wallpapers
-		disable_hyprland_logo = false, -- If true disables the random hyprland logo / anime girl background. :(
-	},
-})
-
 --------------------------------
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
@@ -175,12 +160,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "blueman-manager",
-	match = { class = "blueman-manager" },
-	float = true,
-})
-
-hl.window_rule({
 	name = "tuxedo",
 	match = { class = "tuxedo-control-center" },
 	fullscreen = true,
@@ -206,12 +185,6 @@ hl.window_rule({
 hl.window_rule({
 	name = "qtct",
 	match = { class = "qt5ct" },
-	float = true,
-})
-
-hl.window_rule({
-	name = "calc",
-	match = { class = "org.gnome.Calculator" },
 	float = true,
 })
 

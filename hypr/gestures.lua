@@ -23,13 +23,14 @@ hl.gesture({
 	action = "resize",
 	disable_inhibit = true,
 })
-hl.gesture({
-	fingers = 3,
-	direction = "up",
-	action = function()
-		hl.dispatch(hl.dsp.window.float())
-	end,
-})
+-- 3-finger swipe up = workspace overview (hyprexpo)
+if hl.plugin.hyprexpo ~= nil then
+	hl.plugin.hyprexpo.gesture({
+		fingers = 3,
+		direction = "up",
+		action = "expo",
+	})
+end
 -- 4-finger swipe down = open app launcher (rofi)
 hl.gesture({
 	fingers = 4,

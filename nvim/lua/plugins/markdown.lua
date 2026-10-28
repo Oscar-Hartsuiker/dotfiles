@@ -77,7 +77,14 @@ return {
   },
   {
     "OXY2DEV/markview.nvim",
-    lazy = false,
+    lazy = true,
+    opts = {
+      markdown_inline = {
+        tags = {
+          enable = false,
+        },
+      },
+    },
     -- Completion for `blink.cmp`
     -- dependencies = { "saghen/blink.cmp" },
   },

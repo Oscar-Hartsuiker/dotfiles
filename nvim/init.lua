@@ -15,7 +15,7 @@ vim.cmd(string.format("autocmd VimEnter * :silent exec '!kill -s SIGWINCH %s'", 
 
 require("markview").setup({
   preview = {
-    -- hybrid_modes = { "n" },
-    -- linewise_hybrid_mode = true, -- optional: clears by line instead of syntax node
+    --hybrid_modes = { "n" },
+    linewise_hybrid_mode = false, -- clears the current line instead of just the syntax node
   },
 })

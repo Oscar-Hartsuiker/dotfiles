@@ -1,0 +1,12 @@
+#!/usr/bin/gjs
+
+const {GLib} = imports.gi;
+
+imports.package.init({
+    name: 'sushi',
+    version: '46.0',
+    prefix: '/usr',
+    libdir: '/usr/lib/x86_64-linux-gnu',
+});
+imports.searchPath.unshift(GLib.build_filenamev([GLib.get_user_data_dir(), 'sushi-override']));
+imports.package.run(imports.ui.main);
