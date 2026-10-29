@@ -1,0 +1,160 @@
+set $mod Mod4
+
+### Startup
+exec layman
+exec dbus-update-activation-environment --systemd --all
+exec noctalia
+exec zapzap
+
+### Look (noctalia colours, gaps from general.lua)
+default_border pixel 2
+default_floating_border pixel 2
+gaps inner 4
+gaps outer 8
+#                       border   bg       text     indicator child_border
+client.focused          #6794e4 #6794e4 #f2f2f3 #6c5cd6 #6794e4
+client.unfocused        #181d25 #181d25 #f2f2f3 #181d25 #181d25
+client.focused_inactive #181d25 #181d25 #f2f2f3 #181d25 #181d25
+seat * xcursor_theme default 42
+
+### Outputs (adjust eDP-1 position with `swaymsg -t get_outputs`)
+output HDMI-A-1 mode 3840x2160@30Hz scale 2 pos 0 478
+output eDP-1 mode 1920x1080@60Hz pos 1920 0
+
+### Input
+input type:keyboard {
+    xkb_options caps:swapescape
+    xkb_numlock enabled
+}
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+}
+input type:pointer {
+    scroll_factor 2
+}
+
+### Apps
+bindsym $mod+Return exec ghostty
+bindsym $mod+t exec ghostty
+bindsym $mod+Shift+Return exec alacritty
+bindsym $mod+o exec obsidian
+bindsym $mod+w exec zapzap
+bindsym $mod+e exec nautilus --new-window
+bindsym $mod+b exec firefox
+bindsym $mod+Shift+b exec helium
+
+### Windows
+bindsym $mod+x kill
+bindsym $mod+f fullscreen toggle
+bindsym $mod+Shift+f fullscreen toggle global
+bindsym $mod+Shift+t floating toggle
+bindsym $mod+d floating toggle
+bindsym $mod+Shift+e exec swaymsg exit
+floating_modifier $mod normal
+
+### Focus
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+### Move (through layman so the master/stack stays consistent)
+bindsym $mod+Shift+Left nop layman window move left
+bindsym $mod+Shift+Down nop layman window move down
+bindsym $mod+Shift+Up nop layman window move up
+bindsym $mod+Shift+Right nop layman window move right
+bindsym $mod+Shift+h nop layman window move left
+bindsym $mod+Shift+j nop layman window move down
+bindsym $mod+Shift+k nop layman window move up
+bindsym $mod+Shift+l nop layman window move right
+
+### Resize
+bindsym $mod+minus resize shrink width 100px
+bindsym $mod+equal resize grow width 100px
+bindsym $mod+Shift+minus resize shrink height 100px
+bindsym $mod+Shift+equal resize grow height 100px
+
+### Monitors
+bindsym $mod+Ctrl+Left focus output left
+bindsym $mod+Ctrl+Right focus output right
+bindsym $mod+Ctrl+h focus output left
+bindsym $mod+Ctrl+l focus output right
+bindsym $mod+Shift+Ctrl+Left move container to output left
+bindsym $mod+Shift+Ctrl+Right move container to output right
+bindsym $mod+Shift+Ctrl+h move container to output left
+bindsym $mod+Shift+Ctrl+l move container to output right
+
+### Workspaces
+bindsym $mod+period workspace next
+bindsym $mod+comma workspace prev
+bindsym $mod+Ctrl+i move container to workspace next
+bindsym $mod+Ctrl+u move container to workspace prev
+bindsym $mod+button5 workspace next
+bindsym $mod+button4 workspace prev
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+
+### Scratchpad (your special workspace)
+bindsym $mod+z scratchpad show
+bindsym $mod+Shift+z move scratchpad
+
+### Noctalia (same IPC as your Hyprland binds)
+bindsym $mod+space exec noctalia msg panel-toggle launcher
+bindsym Alt+space exec noctalia msg panel-toggle control-center
+bindsym $mod+Shift+c exec noctalia msg panel-toggle clipboard
+bindsym $mod+n exec noctalia msg panel-toggle control-center notifications
+bindsym $mod+y exec noctalia msg panel-toggle wallpaper
+bindsym $mod+Insert exec noctalia msg settings-toggle
+bindsym $mod+Delete exec noctalia msg panel-toggle session
+bindsym $mod+Escape exec noctalia msg theme-mode-toggle
+bindsym Alt+Tab exec noctalia msg window-switcher
+bindsym $mod+a exec noctalia msg window-switcher
+bindsym $mod+s exec noctalia msg dock-toggle
+bindsym $mod+Alt+l exec noctalia msg session lock
+bindsym --locked XF86AudioRaiseVolume exec noctalia msg volume-up 3
+bindsym --locked XF86AudioLowerVolume exec noctalia msg volume-down 3
+bindsym --locked XF86AudioMute exec noctalia msg volume-mute
+bindsym --locked XF86AudioMicMute exec noctalia msg mic-mute
+bindsym --locked XF86AudioPlay exec noctalia msg media toggle
+bindsym --locked XF86AudioPrev exec noctalia msg media previous
+bindsym --locked XF86AudioNext exec noctalia msg media next
+bindsym --locked XF86MonBrightnessUp exec noctalia msg brightness-up 5
+bindsym --locked XF86MonBrightnessDown exec noctalia msg brightness-down 5
+bindsym Print exec noctalia msg screenshot-region
+bindsym Ctrl+Print exec noctalia msg screenshot-fullscreen
+bindsym Alt+Print exec noctalia msg screenshot-annotate
+
+### Window rules (your float list; app_id is the Wayland class)
+for_window [app_id="org.pulseaudio.pavucontrol"] floating enable
+for_window [app_id="guitarix"] floating enable
+for_window [app_id="QjackCtl"] floating enable
+for_window [app_id="org.rncbc.qjackctl"] floating enable
+for_window [app_id="com.rtosta.zapzap"] floating enable
+for_window [app_id="nwg-look"] floating enable
+for_window [app_id="qt5ct"] floating enable
+for_window [app_id="qt6ct"] floating enable
+for_window [app_id="org.gnome.Calculator"] floating enable
+for_window [app_id="nwg-drawer"] floating enable, resize set 600 600
+for_window [app_id="zoom"] floating enable
