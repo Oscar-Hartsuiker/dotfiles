@@ -12,35 +12,35 @@
 -- template tags must stay literal here because they are expanded before
 -- Lua ever runs.
 local P = {
-  surface                   = '#181d25',
-  surface_container_low     = '#14181f',
-  surface_container         = '#28303e',
-  surface_container_high    = '#242b38',
+  surface                   = '#160f2f',
+  surface_container_low     = '#120c27',
+  surface_container         = '#24184e',
+  surface_container_high    = '#211646',
   on_surface                = '#f2f2f3',
-  on_surface_variant        = '#afb1b6',
-  outline                   = '#626872',
-  outline_variant           = '#606875',
+  on_surface_variant        = '#b0afb6',
+  outline                   = '#63606f',
+  outline_variant           = '#645f74',
   scrim                     = '#000000',
-  primary                   = '#6794e4',
-  on_primary                = '#181d25',
-  primary_container         = '#143c85',
-  on_primary_container      = '#e0e4eb',
-  secondary                 = '#6c5cd6',
-  on_secondary              = '#ebf2fd',
-  secondary_container       = '#21166a',
-  on_secondary_container    = '#e1e0eb',
-  tertiary                  = '#a866cc',
-  on_tertiary               = '#161a22',
-  tertiary_container        = '#4b1b64',
-  on_tertiary_container     = '#e7e0eb',
+  primary                   = '#8467e4',
+  on_primary                = '#13101d',
+  primary_container         = '#2e1485',
+  on_primary_container      = '#ded8f3',
+  secondary                 = '#b55cd6',
+  on_secondary              = '#1b1825',
+  secondary_container       = '#53166a',
+  on_secondary_container    = '#ecd8f3',
+  tertiary                  = '#ce64b6',
+  on_tertiary               = '#1b1825',
+  tertiary_container        = '#651a54',
+  on_tertiary_container     = '#f3d8ed',
   error                     = '#fd4663',
-  on_error                  = '#181d25',
+  on_error                  = '#1b1825',
   error_container           = '#8f0118',
   on_error_container        = '#fecdd4',
   -- Terminal palette: used where a semantic hue matters (warn = yellow,
   -- added = green) and for :terminal buffers.
-  yellow                    = '#8073ef',
-  green                     = '#6794e4',
+  yellow                    = '#b55cd6',
+  green                     = '#8569e6',
 }
 
 ---------------------------------------------------------------------------
@@ -213,184 +213,184 @@ vim.g.colors_name = 'noctalia'
 ---------------------------------------------------------------------------
 -- Terminal colours (:terminal, Snacks terminal, lazygit float).
 ---------------------------------------------------------------------------
-vim.g.terminal_color_0  = '#202632'
+vim.g.terminal_color_0  = '#1d143e'
 vim.g.terminal_color_1  = '#fd4663'
-vim.g.terminal_color_2  = '#6794e4'
-vim.g.terminal_color_3  = '#8073ef'
-vim.g.terminal_color_4  = '#aa68cf'
-vim.g.terminal_color_5  = '#93b3ec'
-vim.g.terminal_color_6  = '#a196e9'
+vim.g.terminal_color_2  = '#8569e6'
+vim.g.terminal_color_3  = '#b55cd6'
+vim.g.terminal_color_4  = '#ce64b6'
+vim.g.terminal_color_5  = '#a793ec'
+vim.g.terminal_color_6  = '#d296e9'
 vim.g.terminal_color_7  = '#f2f2f3'
-vim.g.terminal_color_8  = '#626872'
+vim.g.terminal_color_8  = '#63606f'
 vim.g.terminal_color_9  = '#fd4663'
-vim.g.terminal_color_10 = '#6794e4'
-vim.g.terminal_color_11 = '#8073ef'
-vim.g.terminal_color_12 = '#aa68cf'
-vim.g.terminal_color_13 = '#93b3ec'
-vim.g.terminal_color_14 = '#a196e9'
+vim.g.terminal_color_10 = '#8569e6'
+vim.g.terminal_color_11 = '#b55cd6'
+vim.g.terminal_color_12 = '#ce64b6'
+vim.g.terminal_color_13 = '#a793ec'
+vim.g.terminal_color_14 = '#d296e9'
 vim.g.terminal_color_15 = '#f2f2f3'
 
 ---------------------------------------------------------------------------
 -- Core editor chrome.
 ---------------------------------------------------------------------------
-hi('Normal',        { fg = '#f2f2f3', bg = '#181d25' })
-hi('NormalNC',      { fg = '#f2f2f3', bg = '#181d25' })
-hi('NormalFloat',   { fg = '#f2f2f3', bg = '#242b38' })
-hi('FloatBorder',   { fg = '#626872',     bg = '#242b38' })
-hi('FloatTitle',    { fg = '#181d25',  bg = '#6794e4', bold = true })
-hi('WinBar',        { fg = '#f2f2f3',  bg = '#181d25', bold = true })
-hi('WinBarNC',      { fg = '#afb1b6', bg = '#181d25' })
+hi('Normal',        { fg = '#f2f2f3', bg = '#160f2f' })
+hi('NormalNC',      { fg = '#f2f2f3', bg = '#160f2f' })
+hi('NormalFloat',   { fg = '#f2f2f3', bg = '#211646' })
+hi('FloatBorder',   { fg = '#63606f',     bg = '#211646' })
+hi('FloatTitle',    { fg = '#13101d',  bg = '#8467e4', bold = true })
+hi('WinBar',        { fg = '#f2f2f3',  bg = '#160f2f', bold = true })
+hi('WinBarNC',      { fg = '#b0afb6', bg = '#160f2f' })
 hi('MsgArea',       { fg = '#f2f2f3' })
-hi('ModeMsg',       { fg = '#6794e4', bold = true })
-hi('SpecialKey',    { fg = '#626872' })
-hi('Conceal',       { fg = '#afb1b6' })
-hi('WildMenu',      { fg = '#e0e4eb', bg = '#143c85' })
+hi('ModeMsg',       { fg = '#8467e4', bold = true })
+hi('SpecialKey',    { fg = '#63606f' })
+hi('Conceal',       { fg = '#b0afb6' })
+hi('WildMenu',      { fg = '#ded8f3', bg = '#2e1485' })
 
 ---------------------------------------------------------------------------
 -- Legacy syntax (used when Tree-sitter / LSP aren't loaded).
 ---------------------------------------------------------------------------
-hi('Comment',       { fg = '#afb1b6', italic = true })
+hi('Comment',       { fg = '#b0afb6', italic = true })
 
-hi('Constant',      { fg = '#6794e4' })
-hi('String',        { fg = '#6794e4' })
-hi('Character',     { fg = '#6794e4' })
-hi('Number',        { fg = '#a866cc' })
-hi('Boolean',       { fg = '#a866cc' })
-hi('Float',         { fg = '#a866cc' })
+hi('Constant',      { fg = '#8467e4' })
+hi('String',        { fg = '#8467e4' })
+hi('Character',     { fg = '#8467e4' })
+hi('Number',        { fg = '#ce64b6' })
+hi('Boolean',       { fg = '#ce64b6' })
+hi('Float',         { fg = '#ce64b6' })
 hi('Identifier',    { fg = '#f2f2f3' })
-hi('Function',      { fg = '#6c5cd6' })
-hi('Statement',     { fg = '#6c5cd6' })
-hi('Conditional',   { fg = '#6c5cd6' })
-hi('Repeat',        { fg = '#6c5cd6' })
-hi('Label',         { fg = '#6c5cd6' })
-hi('Operator',      { fg = '#afb1b6' })
-hi('Keyword',       { fg = '#6c5cd6' })
+hi('Function',      { fg = '#b55cd6' })
+hi('Statement',     { fg = '#b55cd6' })
+hi('Conditional',   { fg = '#b55cd6' })
+hi('Repeat',        { fg = '#b55cd6' })
+hi('Label',         { fg = '#b55cd6' })
+hi('Operator',      { fg = '#b0afb6' })
+hi('Keyword',       { fg = '#b55cd6' })
 hi('Exception',     { fg = '#fd4663' })
-hi('PreProc',       { fg = '#a866cc' })
-hi('Include',       { fg = '#a866cc' })
-hi('Define',        { fg = '#a866cc' })
-hi('Macro',         { fg = '#a866cc' })
-hi('PreCondit',     { fg = '#a866cc' })
-hi('Type',          { fg = '#a866cc' })
-hi('StorageClass',  { fg = '#a866cc' })
-hi('Structure',     { fg = '#a866cc' })
-hi('Typedef',       { fg = '#a866cc' })
-hi('Special',       { fg = '#6c5cd6' })
-hi('SpecialChar',   { fg = '#6c5cd6' })
-hi('Tag',           { fg = '#6794e4' })
-hi('Delimiter',     { fg = '#afb1b6' })
-hi('SpecialComment',{ fg = '#afb1b6', italic = true })
+hi('PreProc',       { fg = '#ce64b6' })
+hi('Include',       { fg = '#ce64b6' })
+hi('Define',        { fg = '#ce64b6' })
+hi('Macro',         { fg = '#ce64b6' })
+hi('PreCondit',     { fg = '#ce64b6' })
+hi('Type',          { fg = '#ce64b6' })
+hi('StorageClass',  { fg = '#ce64b6' })
+hi('Structure',     { fg = '#ce64b6' })
+hi('Typedef',       { fg = '#ce64b6' })
+hi('Special',       { fg = '#b55cd6' })
+hi('SpecialChar',   { fg = '#b55cd6' })
+hi('Tag',           { fg = '#8467e4' })
+hi('Delimiter',     { fg = '#b0afb6' })
+hi('SpecialComment',{ fg = '#b0afb6', italic = true })
 hi('Debug',         { fg = '#fd4663' })
-hi('Underlined',    { fg = '#6794e4', underline = true })
+hi('Underlined',    { fg = '#8467e4', underline = true })
 hi('Error',         { fg = '#fd4663' })
-hi('Todo',          { fg = '#e0e4eb', bg = '#143c85', bold = true })
+hi('Todo',          { fg = '#ded8f3', bg = '#2e1485', bold = true })
 hi('Title',         { fg = '#f2f2f3', bold = true })
-hi('Directory',     { fg = '#6794e4' })
+hi('Directory',     { fg = '#8467e4' })
 
 ---------------------------------------------------------------------------
 -- Selection, search, cursor.
 ---------------------------------------------------------------------------
-hi('Visual',        { fg = 'NONE',                                bg = '#143c85' })
-hi('VisualNOS',     { fg = 'NONE',                                bg = '#143c85' })
-hi('Search',        { fg = '#181d25',  bg = '#6794e4' })
-hi('IncSearch',     { fg = '#181d25',  bg = '#a866cc' })
-hi('CurSearch',     { fg = '#181d25',  bg = '#6794e4' })
-hi('Substitute',    { fg = '#181d25',  bg = '#fd4663' })
-hi('MatchParen',    { fg = '#a866cc',    bold = true })
-hi('Cursor',        { fg = '#181d25',     bg = '#f2f2f3' })
-hi('CursorIM',      { fg = '#f2f2f3',  bg = '#181d25' })
-hi('TermCursor',    { fg = '#181d25',     bg = '#f2f2f3' })
-hi('CursorColumn',  { bg = '#28303e' })
-hi('CursorLine',    { bg = '#28303e' })
-hi('CursorLineNr',  { fg = '#6794e4',     bg = '#28303e', bold = true })
-hi('lCursor',       { fg = '#6794e4',     bg = 'NONE', underline = true })
+hi('Visual',        { fg = 'NONE',                                bg = '#2e1485' })
+hi('VisualNOS',     { fg = 'NONE',                                bg = '#2e1485' })
+hi('Search',        { fg = '#13101d',  bg = '#8467e4' })
+hi('IncSearch',     { fg = '#13101d',  bg = '#ce64b6' })
+hi('CurSearch',     { fg = '#13101d',  bg = '#8467e4' })
+hi('Substitute',    { fg = '#13101d',  bg = '#fd4663' })
+hi('MatchParen',    { fg = '#ce64b6',    bold = true })
+hi('Cursor',        { fg = '#160f2f',     bg = '#f2f2f3' })
+hi('CursorIM',      { fg = '#f2f2f3',  bg = '#160f2f' })
+hi('TermCursor',    { fg = '#160f2f',     bg = '#f2f2f3' })
+hi('CursorColumn',  { bg = '#24184e' })
+hi('CursorLine',    { bg = '#24184e' })
+hi('CursorLineNr',  { fg = '#8467e4',     bg = '#24184e', bold = true })
+hi('lCursor',       { fg = '#8467e4',     bg = 'NONE', underline = true })
 
 ---------------------------------------------------------------------------
 -- Line numbers, signs, gutters.
 ---------------------------------------------------------------------------
-hi('LineNr',        { fg = '#626872' })
-hi('LineNrAbove',   { fg = '#606875' })
-hi('LineNrBelow',   { fg = '#606875' })
-hi('SignColumn',    { fg = '#afb1b6', bg = 'NONE' })
-hi('SignAdd',       { fg = '#6794e4' })
-hi('SignChange',    { fg = '#8073ef' })
+hi('LineNr',        { fg = '#63606f' })
+hi('LineNrAbove',   { fg = '#645f74' })
+hi('LineNrBelow',   { fg = '#645f74' })
+hi('SignColumn',    { fg = '#b0afb6', bg = 'NONE' })
+hi('SignAdd',       { fg = '#8569e6' })
+hi('SignChange',    { fg = '#b55cd6' })
 hi('SignDelete',    { fg = '#fd4663' })
-hi('FoldColumn',    { fg = '#afb1b6' })
-hi('Folded',        { fg = '#afb1b6', bg = '#14181f' })
+hi('FoldColumn',    { fg = '#b0afb6' })
+hi('Folded',        { fg = '#b0afb6', bg = '#120c27' })
 
 ---------------------------------------------------------------------------
 -- Statusline, tabline, window chrome.
 ---------------------------------------------------------------------------
-hi('StatusLine',    { fg = '#afb1b6', bg = '#28303e' })
-hi('StatusLineNC',  { fg = '#626872',             bg = '#14181f' })
-hi('WinSeparator',  { fg = '#606875', bg = '#181d25' })
-hi('VertSplit',     { fg = '#606875' })
-hi('TabLine',       { fg = '#626872',             bg = '#14181f' })
-hi('TabLineFill',   { bg = '#14181f' })
-hi('TabLineSel',    { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('ColorColumn',   { bg = '#28303e' })
-hi('QuickFixLine',  { bg = '#143c85', bold = true })
-hi('FoldLine',      { bg = '#28303e' })
+hi('StatusLine',    { fg = '#b0afb6', bg = '#24184e' })
+hi('StatusLineNC',  { fg = '#63606f',             bg = '#120c27' })
+hi('WinSeparator',  { fg = '#645f74', bg = '#160f2f' })
+hi('VertSplit',     { fg = '#645f74' })
+hi('TabLine',       { fg = '#63606f',             bg = '#120c27' })
+hi('TabLineFill',   { bg = '#120c27' })
+hi('TabLineSel',    { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('ColorColumn',   { bg = '#24184e' })
+hi('QuickFixLine',  { bg = '#2e1485', bold = true })
+hi('FoldLine',      { bg = '#24184e' })
 
 ---------------------------------------------------------------------------
 -- Misc editor chrome (whitespace / consec / conceal).
 ---------------------------------------------------------------------------
-hi('Whitespace',    { fg = '#606875' })
-hi('NonText',       { fg = '#606875' })
-hi('EndOfBuffer',   { fg = '#626872' })
+hi('Whitespace',    { fg = '#645f74' })
+hi('NonText',       { fg = '#645f74' })
+hi('EndOfBuffer',   { fg = '#63606f' })
 hi('ConcealLevel1', { fg = '#f2f2f3', bg = 'NONE' })
-hi('ConcealLevel2', { fg = '#a866cc', bg = 'NONE' })
-hi('ConcealLevel3', { fg = '#6c5cd6', bg = 'NONE' })
+hi('ConcealLevel2', { fg = '#ce64b6', bg = 'NONE' })
+hi('ConcealLevel3', { fg = '#b55cd6', bg = 'NONE' })
 
 ---------------------------------------------------------------------------
 -- Diff.
 ---------------------------------------------------------------------------
-hi('DiffAdd',       { bg = '#143c85' })
-hi('DiffChange',    { bg = '#21166a' })
+hi('DiffAdd',       { bg = '#2e1485' })
+hi('DiffChange',    { bg = '#53166a' })
 hi('DiffDelete',    { fg = '#fd4663',          bg = '#8f0118' })
-hi('DiffText',      { bg = '#4b1b64', bold = true })
-hi('Added',         { fg = '#6794e4' })
-hi('Changed',       { fg = '#8073ef' })
+hi('DiffText',      { bg = '#651a54', bold = true })
+hi('Added',         { fg = '#8569e6' })
+hi('Changed',       { fg = '#b55cd6' })
 hi('Removed',       { fg = '#fd4663' })
 
 ---------------------------------------------------------------------------
 -- Messages.
 ---------------------------------------------------------------------------
 hi('ErrorMsg',      { fg = '#fecdd4',       bg = '#8f0118' })
-hi('WarningMsg',    { fg = '#e7e0eb',    bg = '#4b1b64' })
-hi('MoreMsg',       { fg = '#6794e4', bold = true })
-hi('Question',      { fg = '#6c5cd6', bold = true })
-hi('InfoMsg',       { fg = '#f2f2f3',               bg = '#28303e' })
+hi('WarningMsg',    { fg = '#f3d8ed',    bg = '#651a54' })
+hi('MoreMsg',       { fg = '#8467e4', bold = true })
+hi('Question',      { fg = '#b55cd6', bold = true })
+hi('InfoMsg',       { fg = '#f2f2f3',               bg = '#24184e' })
 
 ---------------------------------------------------------------------------
 -- Completion menu (nvim-cmp, native pum, blink.cmp).
 ---------------------------------------------------------------------------
-hi('Pmenu',         { fg = '#f2f2f3',               bg = '#28303e' })
-hi('PmenuSel',      { fg = '#e0e4eb',    bg = '#143c85' })
-hi('PmenuBorder',   { fg = '#626872',                  bg = '#28303e' })
-hi('PmenuSbar',     { bg = '#242b38' })
-hi('PmenuThumb',    { bg = '#626872' })
-hi('PmenuKind',     { fg = '#a866cc' })
-hi('PmenuKindSel',  { fg = '#6794e4', bold = true })
-hi('PmenuExtra',    { fg = '#afb1b6' })
-hi('PmenuExtraSel', { fg = '#afb1b6' })
-hi('PmenuMatch',    { fg = '#6794e4', bold = true })
-hi('PmenuMatchSel', { fg = '#6794e4', bold = true })
+hi('Pmenu',         { fg = '#f2f2f3',               bg = '#24184e' })
+hi('PmenuSel',      { fg = '#ded8f3',    bg = '#2e1485' })
+hi('PmenuBorder',   { fg = '#63606f',                  bg = '#24184e' })
+hi('PmenuSbar',     { bg = '#211646' })
+hi('PmenuThumb',    { bg = '#63606f' })
+hi('PmenuKind',     { fg = '#ce64b6' })
+hi('PmenuKindSel',  { fg = '#8467e4', bold = true })
+hi('PmenuExtra',    { fg = '#b0afb6' })
+hi('PmenuExtraSel', { fg = '#b0afb6' })
+hi('PmenuMatch',    { fg = '#8467e4', bold = true })
+hi('PmenuMatchSel', { fg = '#8467e4', bold = true })
 
 ---------------------------------------------------------------------------
 -- Spell & headings.
 ---------------------------------------------------------------------------
 hi('SpellBad',      { sp = '#fd4663', undercurl = true })
-hi('SpellCap',      { sp = '#a866cc', undercurl = true })
-hi('SpellLocal',    { sp = '#6c5cd6', undercurl = true })
-hi('SpellRare',     { sp = '#afb1b6', undercurl = true })
-hi('Heading',       { fg = '#6794e4', bold = true })
-hi('Heading1',      { fg = '#6794e4',   bold = true })
-hi('Heading2',      { fg = '#6794e4' })
-hi('Heading3',      { fg = '#6c5cd6' })
-hi('Heading4',      { fg = '#a866cc' })
-hi('Heading5',      { fg = '#afb1b6' })
-hi('Heading6',      { fg = '#afb1b6', italic = true })
+hi('SpellCap',      { sp = '#ce64b6', undercurl = true })
+hi('SpellLocal',    { sp = '#b55cd6', undercurl = true })
+hi('SpellRare',     { sp = '#b0afb6', undercurl = true })
+hi('Heading',       { fg = '#8467e4', bold = true })
+hi('Heading1',      { fg = '#8467e4',   bold = true })
+hi('Heading2',      { fg = '#8467e4' })
+hi('Heading3',      { fg = '#b55cd6' })
+hi('Heading4',      { fg = '#ce64b6' })
+hi('Heading5',      { fg = '#b0afb6' })
+hi('Heading6',      { fg = '#b0afb6', italic = true })
 
 ---------------------------------------------------------------------------
 -- Tree-sitter capture groups. LazyVim enables treesitter by default,
@@ -552,233 +552,233 @@ end
 -- Diagnostics.
 ---------------------------------------------------------------------------
 hi('DiagnosticError',                { fg = '#fd4663' })
-hi('DiagnosticWarn',                 { fg = '#8073ef' })
-hi('DiagnosticInfo',                 { fg = '#6c5cd6' })
-hi('DiagnosticHint',                 { fg = '#6794e4' })
-hi('DiagnosticOk',                   { fg = '#6794e4' })
-hi('DiagnosticUnnecessary',          { fg = '#626872', italic = true })
+hi('DiagnosticWarn',                 { fg = '#b55cd6' })
+hi('DiagnosticInfo',                 { fg = '#b55cd6' })
+hi('DiagnosticHint',                 { fg = '#8467e4' })
+hi('DiagnosticOk',                   { fg = '#8467e4' })
+hi('DiagnosticUnnecessary',          { fg = '#63606f', italic = true })
 
 hi('DiagnosticVirtualTextError',     { fg = '#fd4663',    bg = '#8f0118' })
-hi('DiagnosticVirtualTextWarn',      { fg = '#8073ef', bg = '#28303e' })
-hi('DiagnosticVirtualTextInfo',      { fg = '#6c5cd6',bg = '#21166a' })
-hi('DiagnosticVirtualTextHint',      { fg = '#6794e4',  bg = '#143c85' })
-hi('DiagnosticVirtualTextOk',        { fg = '#6794e4', bold = true })
+hi('DiagnosticVirtualTextWarn',      { fg = '#b55cd6', bg = '#24184e' })
+hi('DiagnosticVirtualTextInfo',      { fg = '#b55cd6',bg = '#53166a' })
+hi('DiagnosticVirtualTextHint',      { fg = '#8467e4',  bg = '#2e1485' })
+hi('DiagnosticVirtualTextOk',        { fg = '#8467e4', bold = true })
 
 hi('DiagnosticSignError',            { fg = '#fd4663' })
-hi('DiagnosticSignWarn',             { fg = '#8073ef' })
-hi('DiagnosticSignInfo',             { fg = '#6c5cd6' })
-hi('DiagnosticSignHint',             { fg = '#6794e4' })
-hi('DiagnosticSignOk',               { fg = '#6794e4' })
+hi('DiagnosticSignWarn',             { fg = '#b55cd6' })
+hi('DiagnosticSignInfo',             { fg = '#b55cd6' })
+hi('DiagnosticSignHint',             { fg = '#8467e4' })
+hi('DiagnosticSignOk',               { fg = '#8467e4' })
 
 hi('DiagnosticFloatingError',        { fg = '#fd4663',    bg = '#8f0118' })
-hi('DiagnosticFloatingWarn',         { fg = '#8073ef', bg = '#28303e' })
-hi('DiagnosticFloatingInfo',         { fg = '#6c5cd6',bg = '#21166a' })
-hi('DiagnosticFloatingHint',         { fg = '#6794e4',  bg = '#143c85' })
-hi('DiagnosticFloatingOk',           { fg = '#6794e4',  bg = '#143c85' })
+hi('DiagnosticFloatingWarn',         { fg = '#b55cd6', bg = '#24184e' })
+hi('DiagnosticFloatingInfo',         { fg = '#b55cd6',bg = '#53166a' })
+hi('DiagnosticFloatingHint',         { fg = '#8467e4',  bg = '#2e1485' })
+hi('DiagnosticFloatingOk',           { fg = '#8467e4',  bg = '#2e1485' })
 
 hi('DiagnosticUnderlineError',       { sp = '#fd4663', undercurl = true })
-hi('DiagnosticUnderlineWarn',        { sp = '#8073ef', undercurl = true })
-hi('DiagnosticUnderlineInfo',        { sp = '#6c5cd6', undercurl = true })
-hi('DiagnosticUnderlineHint',        { sp = '#6794e4', undercurl = true })
-hi('DiagnosticUnderlineOk',          { sp = '#6794e4', undercurl = true })
-hi('DiagnosticUnderlineUnnecessary', { sp = '#626872', undercurl = true })
-hi('DiagnosticDeprecated',           { sp = '#626872', undercurl = true })
+hi('DiagnosticUnderlineWarn',        { sp = '#b55cd6', undercurl = true })
+hi('DiagnosticUnderlineInfo',        { sp = '#b55cd6', undercurl = true })
+hi('DiagnosticUnderlineHint',        { sp = '#8467e4', undercurl = true })
+hi('DiagnosticUnderlineOk',          { sp = '#8467e4', undercurl = true })
+hi('DiagnosticUnderlineUnnecessary', { sp = '#63606f', undercurl = true })
+hi('DiagnosticDeprecated',           { sp = '#63606f', undercurl = true })
 
 ---------------------------------------------------------------------------
 -- Lazy.nvim UI.
 ---------------------------------------------------------------------------
-hi('LazyNormal',        { fg = '#f2f2f3', bg = '#181d25' })
-hi('LazyBorder',        { fg = '#626872' })
-hi('LazyTitle',         { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('LazySpecial',       { fg = '#a866cc' })
-hi('LazyProp',          { fg = '#6c5cd6' })
-hi('LazyComment',       { fg = '#afb1b6', italic = true })
-hi('LazyH1',            { fg = '#6794e4', bold = true })
-hi('LazyH2',            { fg = '#6c5cd6', bold = true })
-hi('LazyDim',           { fg = '#626872' })
-hi('LazyButton',        { fg = '#6794e4' })
-hi('LazyButtonActive',  { fg = '#181d25', bg = '#6794e4', bold = true })
+hi('LazyNormal',        { fg = '#f2f2f3', bg = '#160f2f' })
+hi('LazyBorder',        { fg = '#63606f' })
+hi('LazyTitle',         { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('LazySpecial',       { fg = '#ce64b6' })
+hi('LazyProp',          { fg = '#b55cd6' })
+hi('LazyComment',       { fg = '#b0afb6', italic = true })
+hi('LazyH1',            { fg = '#8467e4', bold = true })
+hi('LazyH2',            { fg = '#b55cd6', bold = true })
+hi('LazyDim',           { fg = '#63606f' })
+hi('LazyButton',        { fg = '#8467e4' })
+hi('LazyButtonActive',  { fg = '#13101d', bg = '#8467e4', bold = true })
 
 ---------------------------------------------------------------------------
 -- Snacks (dashboard / picker / notifier). LazyVim ships Snacks by default.
 ---------------------------------------------------------------------------
-hi('SnacksNormal',                   { fg = '#f2f2f3', bg = '#242b38' })
-hi('SnacksBorder',                   { fg = '#626872', bg = '#242b38' })
-hi('SnacksTitle',                    { fg = '#181d25', bg = '#6794e4', bold = true })
+hi('SnacksNormal',                   { fg = '#f2f2f3', bg = '#211646' })
+hi('SnacksBorder',                   { fg = '#63606f', bg = '#211646' })
+hi('SnacksTitle',                    { fg = '#13101d', bg = '#8467e4', bold = true })
 hi('SnacksBackdrop',                 { fg = 'NONE',                               bg = '#000000' })
-hi('SnacksWinSelect',                { fg = 'NONE',                               bg = '#143c85' })
-hi('SnacksWinSelectNC',              { fg = 'NONE',                               bg = '#143c85' })
+hi('SnacksWinSelect',                { fg = 'NONE',                               bg = '#2e1485' })
+hi('SnacksWinSelectNC',              { fg = 'NONE',                               bg = '#2e1485' })
 
-hi('SnacksDashboardNormal',          { fg = '#f2f2f3', bg = '#181d25' })
-hi('SnacksDashboardHeader',          { fg = '#6794e4', bold = true })
-hi('SnacksDashboardFooter',          { fg = '#afb1b6' })
-hi('SnacksDashboardIcon',            { fg = '#6c5cd6' })
-hi('SnacksDashboardSpecial',         { fg = '#a866cc' })
+hi('SnacksDashboardNormal',          { fg = '#f2f2f3', bg = '#160f2f' })
+hi('SnacksDashboardHeader',          { fg = '#8467e4', bold = true })
+hi('SnacksDashboardFooter',          { fg = '#b0afb6' })
+hi('SnacksDashboardIcon',            { fg = '#b55cd6' })
+hi('SnacksDashboardSpecial',         { fg = '#ce64b6' })
 
-hi('SnacksPickerNormal',             { fg = '#f2f2f3', bg = '#181d25' })
-hi('SnacksPickerBorder',             { fg = '#626872', bg = '#181d25' })
-hi('SnacksPickerTitle',              { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('SnacksPickerPreview',            { fg = '#afb1b6', bg = '#28303e' })
-hi('SnacksPickerPreviewBorder',      { fg = '#606875', bg = '#28303e' })
-hi('SnacksPickerPreviewTitle',       { fg = '#ebf2fd', bg = '#6c5cd6', bold = true })
-hi('SnacksPickerMatch',              { fg = '#6794e4', bold = true })
-hi('SnacksPickerSelection',          { fg = '#e0e4eb', bg = '#143c85' })
-hi('SnacksPickerSelectionBorder',    { fg = '#6794e4' })
-hi('SnacksPickerCursor',             { fg = '#6794e4' })
-hi('SnacksPickerCursorLine',         { bg = '#28303e' })
-hi('SnacksPickerListCursorLine',     { bg = '#28303e' })
-hi('SnacksPickerDir',                { fg = '#6794e4' })
+hi('SnacksPickerNormal',             { fg = '#f2f2f3', bg = '#160f2f' })
+hi('SnacksPickerBorder',             { fg = '#63606f', bg = '#160f2f' })
+hi('SnacksPickerTitle',              { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('SnacksPickerPreview',            { fg = '#b0afb6', bg = '#24184e' })
+hi('SnacksPickerPreviewBorder',      { fg = '#645f74', bg = '#24184e' })
+hi('SnacksPickerPreviewTitle',       { fg = '#1b1825', bg = '#b55cd6', bold = true })
+hi('SnacksPickerMatch',              { fg = '#8467e4', bold = true })
+hi('SnacksPickerSelection',          { fg = '#ded8f3', bg = '#2e1485' })
+hi('SnacksPickerSelectionBorder',    { fg = '#8467e4' })
+hi('SnacksPickerCursor',             { fg = '#8467e4' })
+hi('SnacksPickerCursorLine',         { bg = '#24184e' })
+hi('SnacksPickerListCursorLine',     { bg = '#24184e' })
+hi('SnacksPickerDir',                { fg = '#8467e4' })
 hi('SnacksPickerPath',               { fg = '#f2f2f3' })
-hi('SnacksPickerReadonly',           { fg = '#afb1b6' })
-hi('SnacksPickerBufferHid',          { fg = '#626872' })
-hi('SnacksPickerBufferVisible',      { fg = '#a866cc' })
-hi('SnacksPickerIndicator',          { fg = '#a866cc' })
-hi('SnacksPickerScrollFloat',        { bg = '#28303e' })
-hi('SnacksPickerScrollFloatBorder',  { fg = '#606875' })
+hi('SnacksPickerReadonly',           { fg = '#b0afb6' })
+hi('SnacksPickerBufferHid',          { fg = '#63606f' })
+hi('SnacksPickerBufferVisible',      { fg = '#ce64b6' })
+hi('SnacksPickerIndicator',          { fg = '#ce64b6' })
+hi('SnacksPickerScrollFloat',        { bg = '#24184e' })
+hi('SnacksPickerScrollFloatBorder',  { fg = '#645f74' })
 
-hi('SnacksIndent',                   { fg = '#606875' })
-hi('SnacksIndentScope',              { fg = '#6794e4' })
+hi('SnacksIndent',                   { fg = '#645f74' })
+hi('SnacksIndentScope',              { fg = '#8467e4' })
 
-hi('SnacksNotifierNormal',           { fg = '#f2f2f3', bg = '#28303e' })
-hi('SnacksNotifierBorder',           { fg = '#626872' })
-hi('SnacksNotifierTitle',            { fg = '#6794e4', bold = true })
-hi('SnacksNotifierIconInfo',         { fg = '#6c5cd6' })
-hi('SnacksNotifierIconWarn',         { fg = '#8073ef' })
+hi('SnacksNotifierNormal',           { fg = '#f2f2f3', bg = '#24184e' })
+hi('SnacksNotifierBorder',           { fg = '#63606f' })
+hi('SnacksNotifierTitle',            { fg = '#8467e4', bold = true })
+hi('SnacksNotifierIconInfo',         { fg = '#b55cd6' })
+hi('SnacksNotifierIconWarn',         { fg = '#b55cd6' })
 hi('SnacksNotifierIconError',        { fg = '#fd4663' })
-hi('SnacksNotifierIconDebug',        { fg = '#afb1b6' })
-hi('SnacksNotifierIconTrace',        { fg = '#626872' })
+hi('SnacksNotifierIconDebug',        { fg = '#b0afb6' })
+hi('SnacksNotifierIconTrace',        { fg = '#63606f' })
 
-hi('SnacksScope',                    { fg = '#e0e4eb', bg = '#143c85', bold = true })
-hi('SnacksZenMode',                  { fg = '#181d25', bg = '#6794e4', bold = true })
+hi('SnacksScope',                    { fg = '#ded8f3', bg = '#2e1485', bold = true })
+hi('SnacksZenMode',                  { fg = '#13101d', bg = '#8467e4', bold = true })
 hi('SnacksStatusline',               { link = 'StatusLine' })
 
 ---------------------------------------------------------------------------
 -- Neo-tree (file explorer).
 ---------------------------------------------------------------------------
-hi('NeoTreeNormal',       { fg = '#f2f2f3', bg = '#181d25' })
-hi('NeoTreeNormalNC',     { fg = '#f2f2f3', bg = '#181d25' })
-hi('NeoTreeEndOfBuffer',  { fg = '#626872', bg = '#181d25' })
-hi('NeoTreeWinSeparator', { fg = '#606875', bg = '#181d25' })
-hi('NeoTreeVertSeparator',{ fg = '#606875', bg = '#181d25' })
-hi('NeoTreeRootName',     { fg = '#6794e4', bold = true })
-hi('NeoTreeDirName',      { fg = '#6794e4' })
+hi('NeoTreeNormal',       { fg = '#f2f2f3', bg = '#160f2f' })
+hi('NeoTreeNormalNC',     { fg = '#f2f2f3', bg = '#160f2f' })
+hi('NeoTreeEndOfBuffer',  { fg = '#63606f', bg = '#160f2f' })
+hi('NeoTreeWinSeparator', { fg = '#645f74', bg = '#160f2f' })
+hi('NeoTreeVertSeparator',{ fg = '#645f74', bg = '#160f2f' })
+hi('NeoTreeRootName',     { fg = '#8467e4', bold = true })
+hi('NeoTreeDirName',      { fg = '#8467e4' })
 hi('NeoTreeFileName',     { fg = '#f2f2f3' })
-hi('NeoTreeOpenedFileName', { fg = '#6c5cd6', bg = '#28303e' })
-hi('NeoTreeSpecialFile',  { fg = '#a866cc' })
-hi('NeoTreeExecFile',     { fg = '#6c5cd6' })
-hi('NeoTreeEmptyDirectoryName', { fg = '#626872' })
-hi('NeoTreeHidden',       { fg = '#626872' })
-hi('NeoTreeFloatBorder',  { fg = '#626872', bg = '#242b38' })
-hi('NeoTreeFloatTitle',   { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('NeoTreeIndentBlank',  { fg = '#606875' })
-hi('NeoTreeIndentGuide',  { fg = '#606875' })
-hi('NeoTreeBufNr',        { fg = '#626872' })
-hi('NeoTreeGitDirty',     { fg = '#8073ef' })
-hi('NeoTreeGitStaged',    { fg = '#6794e4' })
-hi('NeoTreeGitMerge',     { fg = '#a866cc' })
-hi('NeoTreeGitRenamed',   { fg = '#6c5cd6' })
+hi('NeoTreeOpenedFileName', { fg = '#b55cd6', bg = '#24184e' })
+hi('NeoTreeSpecialFile',  { fg = '#ce64b6' })
+hi('NeoTreeExecFile',     { fg = '#b55cd6' })
+hi('NeoTreeEmptyDirectoryName', { fg = '#63606f' })
+hi('NeoTreeHidden',       { fg = '#63606f' })
+hi('NeoTreeFloatBorder',  { fg = '#63606f', bg = '#211646' })
+hi('NeoTreeFloatTitle',   { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('NeoTreeIndentBlank',  { fg = '#645f74' })
+hi('NeoTreeIndentGuide',  { fg = '#645f74' })
+hi('NeoTreeBufNr',        { fg = '#63606f' })
+hi('NeoTreeGitDirty',     { fg = '#b55cd6' })
+hi('NeoTreeGitStaged',    { fg = '#8569e6' })
+hi('NeoTreeGitMerge',     { fg = '#ce64b6' })
+hi('NeoTreeGitRenamed',   { fg = '#b55cd6' })
 hi('NeoTreeGitDeleted',   { fg = '#fd4663' })
-hi('NeoTreeGitUntracked', { fg = '#a866cc' })
-hi('NeoTreeGitUnstaged',  { fg = '#8073ef' })
-hi('NeoTreeGitIgnored',   { fg = '#626872' })
+hi('NeoTreeGitUntracked', { fg = '#ce64b6' })
+hi('NeoTreeGitUnstaged',  { fg = '#b55cd6' })
+hi('NeoTreeGitIgnored',   { fg = '#63606f' })
 
 ---------------------------------------------------------------------------
 -- Jump plugins (flash.nvim default, leap.nvim alternative).
 ---------------------------------------------------------------------------
-hi('FlashBackdrop',       { fg = '#626872' })
-hi('FlashLabel',          { fg = '#181d25', bg = '#6794e4', bold = true })
+hi('FlashBackdrop',       { fg = '#63606f' })
+hi('FlashLabel',          { fg = '#13101d', bg = '#8467e4', bold = true })
 
-hi('LeapLabelPrimary',    { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('LeapLabelSecondary',  { fg = '#ebf2fd', bg = '#6c5cd6', bold = true })
-hi('LeapLabelSelected',   { fg = '#161a22', bg = '#a866cc', bold = true })
-hi('LeapBackdrop',        { fg = '#626872' })
+hi('LeapLabelPrimary',    { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('LeapLabelSecondary',  { fg = '#1b1825', bg = '#b55cd6', bold = true })
+hi('LeapLabelSelected',   { fg = '#1b1825', bg = '#ce64b6', bold = true })
+hi('LeapBackdrop',        { fg = '#63606f' })
 
 ---------------------------------------------------------------------------
 -- Which-key.
 ---------------------------------------------------------------------------
-hi('WhichKey',            { fg = '#6794e4' })
-hi('WhichKeyGroup',       { fg = '#6794e4', bold = true })
-hi('WhichKeySeparator',   { fg = '#626872' })
-hi('WhichKeyFloat',       { fg = '#f2f2f3', bg = '#242b38' })
-hi('WhichKeyBorder',      { fg = '#626872', bg = '#242b38' })
-hi('WhichKeyDesc',        { fg = '#afb1b6' })
+hi('WhichKey',            { fg = '#8467e4' })
+hi('WhichKeyGroup',       { fg = '#8467e4', bold = true })
+hi('WhichKeySeparator',   { fg = '#63606f' })
+hi('WhichKeyFloat',       { fg = '#f2f2f3', bg = '#211646' })
+hi('WhichKeyBorder',      { fg = '#63606f', bg = '#211646' })
+hi('WhichKeyDesc',        { fg = '#b0afb6' })
 
 ---------------------------------------------------------------------------
 -- Gitsigns.
 ---------------------------------------------------------------------------
-hi('GitSignsAdd',         { fg = '#6794e4' })
-hi('GitSignsChange',      { fg = '#8073ef' })
+hi('GitSignsAdd',         { fg = '#8569e6' })
+hi('GitSignsChange',      { fg = '#b55cd6' })
 hi('GitSignsDelete',      { fg = '#fd4663' })
 hi('GitSignsTopdelete',   { fg = '#fd4663' })
-hi('GitSignsChangedelete',{ fg = '#8073ef' })
-hi('GitSignsUntracked',   { fg = '#a866cc' })
+hi('GitSignsChangedelete',{ fg = '#b55cd6' })
+hi('GitSignsUntracked',   { fg = '#ce64b6' })
 
 ---------------------------------------------------------------------------
 -- Treesitter context (context line above the current block).
 ---------------------------------------------------------------------------
-hi('TreesitterContext',         { bg = '#28303e' })
-hi('TreesitterContextLineNumber',{ fg = '#6794e4', bg = '#28303e' })
-hi('TreesitterContextBottom',   { sp = '#606875', underline = true })
-hi('TreesitterContextSeparator',{ fg = '#606875' })
+hi('TreesitterContext',         { bg = '#24184e' })
+hi('TreesitterContextLineNumber',{ fg = '#8467e4', bg = '#24184e' })
+hi('TreesitterContextBottom',   { sp = '#645f74', underline = true })
+hi('TreesitterContextSeparator',{ fg = '#645f74' })
 
 ---------------------------------------------------------------------------
 -- Aerial (code outline sidebar).
 ---------------------------------------------------------------------------
-hi('AerialNormal',       { fg = '#f2f2f3', bg = '#181d25' })
-hi('AerialLineNC',       { fg = '#626872' })
-hi('AerialGuide',        { fg = '#606875' })
-hi('AerialLine',         { fg = '#afb1b6' })
-hi('AerialLineAbove',    { fg = '#626872' })
-hi('AerialLineBelow',    { fg = '#626872' })
+hi('AerialNormal',       { fg = '#f2f2f3', bg = '#160f2f' })
+hi('AerialLineNC',       { fg = '#63606f' })
+hi('AerialGuide',        { fg = '#645f74' })
+hi('AerialLine',         { fg = '#b0afb6' })
+hi('AerialLineAbove',    { fg = '#63606f' })
+hi('AerialLineBelow',    { fg = '#63606f' })
 
 ---------------------------------------------------------------------------
 -- Illuminate (word under cursor).
 ---------------------------------------------------------------------------
-hi('IlluminatedWord',       { bg = '#4b1b64' })
-hi('IlluminatedWordText',   { bg = '#4b1b64' })
-hi('IlluminatedWordYank',   { bg = '#143c85' })
-hi('IlluminatedWordPaste',  { bg = '#21166a' })
+hi('IlluminatedWord',       { bg = '#651a54' })
+hi('IlluminatedWordText',   { bg = '#651a54' })
+hi('IlluminatedWordYank',   { bg = '#2e1485' })
+hi('IlluminatedWordPaste',  { bg = '#53166a' })
 
 ---------------------------------------------------------------------------
 -- Completion (nvim-cmp and blink.cmp).
 ---------------------------------------------------------------------------
 hi('CmpItemAbbr',           { fg = '#f2f2f3' })
-hi('CmpItemAbbrMatch',      { fg = '#6794e4', bold = true })
-hi('CmpItemAbbrMatchFuzzy', { fg = '#6794e4', bold = true })
-hi('CmpItemMenu',           { fg = '#afb1b6' })
-hi('CmpItemKind',           { fg = '#a866cc' })
-hi('CmpItemKindMatch',      { fg = '#6794e4', bold = true })
-hi('CmpItemKindMatchFuzzy', { fg = '#6794e4', bold = true })
+hi('CmpItemAbbrMatch',      { fg = '#8467e4', bold = true })
+hi('CmpItemAbbrMatchFuzzy', { fg = '#8467e4', bold = true })
+hi('CmpItemMenu',           { fg = '#b0afb6' })
+hi('CmpItemKind',           { fg = '#ce64b6' })
+hi('CmpItemKindMatch',      { fg = '#8467e4', bold = true })
+hi('CmpItemKindMatchFuzzy', { fg = '#8467e4', bold = true })
 
-hi('BlinkCmpMenu',              { fg = '#f2f2f3', bg = '#28303e' })
-hi('BlinkCmpMenuBorder',        { fg = '#626872', bg = '#28303e' })
-hi('BlinkCmpMenuSelection',     { fg = '#e0e4eb', bg = '#143c85' })
+hi('BlinkCmpMenu',              { fg = '#f2f2f3', bg = '#24184e' })
+hi('BlinkCmpMenuBorder',        { fg = '#63606f', bg = '#24184e' })
+hi('BlinkCmpMenuSelection',     { fg = '#ded8f3', bg = '#2e1485' })
 hi('BlinkCmpLabel',             { fg = '#f2f2f3' })
-hi('BlinkCmpLabelMatch',        { fg = '#6794e4', bold = true })
-hi('BlinkCmpLabelDeprecated',   { fg = '#626872', strikethrough = true })
-hi('BlinkCmpLabelDetail',       { fg = '#afb1b6' })
-hi('BlinkCmpLabelDescription',  { fg = '#afb1b6' })
-hi('BlinkCmpKind',              { fg = '#a866cc' })
-hi('BlinkCmpSource',            { fg = '#626872' })
-hi('BlinkCmpGhostText',         { fg = '#626872', italic = true })
-hi('BlinkCmpDoc',               { fg = '#f2f2f3', bg = '#242b38' })
-hi('BlinkCmpDocBorder',         { fg = '#626872', bg = '#242b38' })
-hi('BlinkCmpDocSeparator',      { fg = '#606875', bg = '#242b38' })
-hi('BlinkCmpSignatureHelp',       { fg = '#f2f2f3', bg = '#242b38' })
-hi('BlinkCmpSignatureHelpBorder', { fg = '#626872', bg = '#242b38' })
+hi('BlinkCmpLabelMatch',        { fg = '#8467e4', bold = true })
+hi('BlinkCmpLabelDeprecated',   { fg = '#63606f', strikethrough = true })
+hi('BlinkCmpLabelDetail',       { fg = '#b0afb6' })
+hi('BlinkCmpLabelDescription',  { fg = '#b0afb6' })
+hi('BlinkCmpKind',              { fg = '#ce64b6' })
+hi('BlinkCmpSource',            { fg = '#63606f' })
+hi('BlinkCmpGhostText',         { fg = '#63606f', italic = true })
+hi('BlinkCmpDoc',               { fg = '#f2f2f3', bg = '#211646' })
+hi('BlinkCmpDocBorder',         { fg = '#63606f', bg = '#211646' })
+hi('BlinkCmpDocSeparator',      { fg = '#645f74', bg = '#211646' })
+hi('BlinkCmpSignatureHelp',       { fg = '#f2f2f3', bg = '#211646' })
+hi('BlinkCmpSignatureHelpBorder', { fg = '#63606f', bg = '#211646' })
 hi('BlinkCmpSignatureHelpActiveParameter', { link = 'LspSignatureActiveParameter' })
 
 ---------------------------------------------------------------------------
 -- Trouble (diagnostic list).
 ---------------------------------------------------------------------------
-hi('TroubleNormal',       { fg = '#f2f2f3', bg = '#242b38' })
-hi('TroubleBorder',       { fg = '#626872', bg = '#242b38' })
-hi('TroubleTitle',        { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('TroubleSource',       { fg = '#afb1b6' })
-hi('TroubleIndent',       { fg = '#606875' })
-hi('TroubleCount',        { fg = '#a866cc' })
-hi('TroubleFold',         { fg = '#afb1b6' })
-hi('TroubleLocation',     { fg = '#afb1b6' })
+hi('TroubleNormal',       { fg = '#f2f2f3', bg = '#211646' })
+hi('TroubleBorder',       { fg = '#63606f', bg = '#211646' })
+hi('TroubleTitle',        { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('TroubleSource',       { fg = '#b0afb6' })
+hi('TroubleIndent',       { fg = '#645f74' })
+hi('TroubleCount',        { fg = '#ce64b6' })
+hi('TroubleFold',         { fg = '#b0afb6' })
+hi('TroubleLocation',     { fg = '#b0afb6' })
 
 ---------------------------------------------------------------------------
 -- Markdown (older group names retained by some renderers).
@@ -789,66 +789,66 @@ hi('markdownH3',          { link = 'Heading3' })
 hi('markdownH4',          { link = 'Heading4' })
 hi('markdownH5',          { link = 'Heading5' })
 hi('markdownH6',          { link = 'Heading6' })
-hi('markdownBlockquote',  { fg = '#afb1b6', italic = true })
+hi('markdownBlockquote',  { fg = '#b0afb6', italic = true })
 hi('markdownBold',        { fg = '#f2f2f3', bold = true })
-hi('markdownBullet',      { fg = '#6794e4' })
-hi('markdownCode',        { fg = '#6794e4', bg = '#28303e' })
-hi('markdownCodeBlock',   { fg = '#f2f2f3', bg = '#28303e' })
+hi('markdownBullet',      { fg = '#8467e4' })
+hi('markdownCode',        { fg = '#8467e4', bg = '#24184e' })
+hi('markdownCodeBlock',   { fg = '#f2f2f3', bg = '#24184e' })
 hi('markdownCodeInline',  { link = 'markdownCode' })
 hi('markdownEmphasis',    { fg = '#f2f2f3', italic = true })
-hi('markdownEscape',      { fg = '#a866cc' })
+hi('markdownEscape',      { fg = '#ce64b6' })
 hi('markdownHeading',     { link = 'Heading' })
-hi('markdownHorizontalRule',{ fg = '#626872' })
+hi('markdownHorizontalRule',{ fg = '#63606f' })
 hi('markdownItalic',      { link = 'markdownEmphasis' })
-hi('markdownLink',        { fg = '#6794e4', underline = true })
-hi('markdownLinkText',    { fg = '#6c5cd6', underline = true })
+hi('markdownLink',        { fg = '#8467e4', underline = true })
+hi('markdownLinkText',    { fg = '#b55cd6', underline = true })
 hi('markdownList',        { link = 'markdownBullet' })
 hi('markdownOrderedList', { link = 'markdownBullet' })
 hi('markdownRule',        { link = 'markdownHorizontalRule' })
-hi('markdownStrike',      { fg = '#afb1b6', strikethrough = true })
+hi('markdownStrike',      { fg = '#b0afb6', strikethrough = true })
 hi('markdownStrong',      { link = 'markdownBold' })
-hi('markdownUrl',         { fg = '#6794e4', underline = true })
+hi('markdownUrl',         { fg = '#8467e4', underline = true })
 
 ---------------------------------------------------------------------------
 -- Telescope (commonly added back via :LazyExtra).
 ---------------------------------------------------------------------------
-hi('TelescopeNormal',       { fg = '#f2f2f3', bg = '#181d25' })
-hi('TelescopeBorder',       { fg = '#626872', bg = '#181d25' })
-hi('TelescopeTitle',        { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('TelescopePromptNormal', { fg = '#f2f2f3', bg = '#181d25' })
-hi('TelescopePromptBorder', { fg = '#626872', bg = '#181d25' })
-hi('TelescopePromptTitle',  { fg = '#181d25', bg = '#6794e4', bold = true })
-hi('TelescopePromptPrefix', { fg = '#6794e4' })
-hi('TelescopePromptCounter',{ fg = '#afb1b6' })
-hi('TelescopeResultsTitle', { fg = '#161a22', bg = '#a866cc', bold = true })
-hi('TelescopePreviewTitle', { fg = '#ebf2fd', bg = '#6c5cd6', bold = true })
-hi('TelescopeSelection',    { fg = 'NONE', bg = '#143c85' })
-hi('TelescopeSelectionCaret',{ fg = '#6794e4', bg = '#143c85' })
-hi('TelescopeMultiSelection',{ fg = '#6794e4' })
-hi('TelescopeMultiIcon',    { fg = '#6794e4' })
-hi('TelescopeMatching',     { fg = '#6794e4', bold = true })
+hi('TelescopeNormal',       { fg = '#f2f2f3', bg = '#160f2f' })
+hi('TelescopeBorder',       { fg = '#63606f', bg = '#160f2f' })
+hi('TelescopeTitle',        { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('TelescopePromptNormal', { fg = '#f2f2f3', bg = '#160f2f' })
+hi('TelescopePromptBorder', { fg = '#63606f', bg = '#160f2f' })
+hi('TelescopePromptTitle',  { fg = '#13101d', bg = '#8467e4', bold = true })
+hi('TelescopePromptPrefix', { fg = '#8467e4' })
+hi('TelescopePromptCounter',{ fg = '#b0afb6' })
+hi('TelescopeResultsTitle', { fg = '#1b1825', bg = '#ce64b6', bold = true })
+hi('TelescopePreviewTitle', { fg = '#1b1825', bg = '#b55cd6', bold = true })
+hi('TelescopeSelection',    { fg = 'NONE', bg = '#2e1485' })
+hi('TelescopeSelectionCaret',{ fg = '#8467e4', bg = '#2e1485' })
+hi('TelescopeMultiSelection',{ fg = '#8467e4' })
+hi('TelescopeMultiIcon',    { fg = '#8467e4' })
+hi('TelescopeMatching',     { fg = '#8467e4', bold = true })
 
 ---------------------------------------------------------------------------
 -- Noice (optional replacement for messages/notifications).
 ---------------------------------------------------------------------------
-hi('NoiceVirtualText',      { fg = '#afb1b6', bg = '#28303e' })
-hi('NoiceScrollFloat',      { bg = '#28303e' })
+hi('NoiceVirtualText',      { fg = '#b0afb6', bg = '#24184e' })
+hi('NoiceScrollFloat',      { bg = '#24184e' })
 
 ---------------------------------------------------------------------------
 -- nvim-notify.
 ---------------------------------------------------------------------------
-hi('NotifyBackground',      { bg = '#28303e' })
-hi('NotifyBorder',          { fg = '#626872' })
+hi('NotifyBackground',      { bg = '#24184e' })
+hi('NotifyBorder',          { fg = '#63606f' })
 hi('NotifyErrorTitle',      { fg = '#fd4663', bold = true })
-hi('NotifyWarnTitle',       { fg = '#8073ef', bold = true })
-hi('NotifyInfoTitle',       { fg = '#6c5cd6', bold = true })
-hi('NotifyDebugTitle',      { fg = '#afb1b6' })
-hi('NotifyTraceTitle',      { fg = '#626872' })
+hi('NotifyWarnTitle',       { fg = '#b55cd6', bold = true })
+hi('NotifyInfoTitle',       { fg = '#b55cd6', bold = true })
+hi('NotifyDebugTitle',      { fg = '#b0afb6' })
+hi('NotifyTraceTitle',      { fg = '#63606f' })
 hi('NotifyErrorIcon',       { fg = '#fd4663' })
-hi('NotifyWarnIcon',        { fg = '#8073ef' })
-hi('NotifyInfoIcon',        { fg = '#6c5cd6' })
-hi('NotifyDebugIcon',       { fg = '#afb1b6' })
-hi('NotifyTraceIcon',       { fg = '#626872' })
+hi('NotifyWarnIcon',        { fg = '#b55cd6' })
+hi('NotifyInfoIcon',        { fg = '#b55cd6' })
+hi('NotifyDebugIcon',       { fg = '#b0afb6' })
+hi('NotifyTraceIcon',       { fg = '#63606f' })
 hi('NotifyErrorBody',       { fg = '#f2f2f3' })
 hi('NotifyWarnBody',        { fg = '#f2f2f3' })
 hi('NotifyInfoBody',        { fg = '#f2f2f3' })
@@ -856,13 +856,13 @@ hi('NotifyInfoBody',        { fg = '#f2f2f3' })
 ---------------------------------------------------------------------------
 -- LSP references (peekDefinition, document highlights).
 ---------------------------------------------------------------------------
-hi('LspReferenceText',      { bg = '#4b1b64', underline = true })
-hi('LspReferenceRead',      { bg = '#28303e', underline = true })
-hi('LspReferenceWrite',     { bg = '#143c85', underline = true })
-hi('LspInlayHint',          { fg = '#626872', bg = '#14181f', italic = true })
-hi('LspCodeLens',           { fg = '#626872', italic = true })
-hi('LspCodeLensSeparator',  { fg = '#606875' })
-hi('LspSignatureActiveParameter', { fg = '#e0e4eb', bg = '#143c85', bold = true })
+hi('LspReferenceText',      { bg = '#651a54', underline = true })
+hi('LspReferenceRead',      { bg = '#24184e', underline = true })
+hi('LspReferenceWrite',     { bg = '#2e1485', underline = true })
+hi('LspInlayHint',          { fg = '#63606f', bg = '#120c27', italic = true })
+hi('LspCodeLens',           { fg = '#63606f', italic = true })
+hi('LspCodeLensSeparator',  { fg = '#645f74' })
+hi('LspSignatureActiveParameter', { fg = '#ded8f3', bg = '#2e1485', bold = true })
 
 ---------------------------------------------------------------------------
 -- SIGUSR1 handler. Noctalia sends this signal after rewriting the file so

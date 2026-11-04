@@ -11,6 +11,7 @@ hl.config({
 		numlock_by_default = true,
 		kb_options = "caps:swapescape",
 		follow_mouse = 1,
+		mouse_refocus = false,
 		touchpad = {
 			tap_to_click = true,
 			natural_scroll = true,

@@ -1,6 +1,208 @@
--- General Hyprland keybinds (shell-independent)
+local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
-local mainMod = "SUPER"
+hl.bind("SUPER + X", hl.dsp.window.close())
+
+-- SPECIAL WORKSPACES
+
+hl.bind(mainMod .. " + z", hl.dsp.workspace.toggle_special("󰟠"))
+hl.bind(mainMod .. " + SHIFT + z", function()
+	hl.dispatch(hl.dsp.window.move({ workspace = "special:󰟠" }))
+	hl.dispatch(hl.dsp.window.float({ action = "float" }))
+	hl.dispatch(hl.dsp.window.resize({ x = 900, y = 600, relative = false }))
+end)
+
+--- FLOAT WINDOW
+---
+hl.bind(mainMod .. " + d ", function()
+	local w = hl.get_active_window()
+	local was_floating = w ~= nil and w.floating
+	hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
+	if w ~= nil and not was_floating then
+		hl.dispatch(hl.dsp.window.resize({ x = 900, y = 600, relative = false }))
+	end
+end)
+
+for workspace = 1, 10 do
+	local key = "code:" .. tostring(workspace + 9)
+	hl.bind("SUPER + " .. key, hl.dsp.focus({ workspace = workspace }))
+	hl.bind("SUPER + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace, follow = true }))
+	hl.bind("SUPER + SHIFT + ALT + " .. key, hl.dsp.window.move({ workspace = workspace, follow = false }))
+end
+-- Move active window to a workspace with mainMod + SHIFT + F1-F10
+for i = 1, 8 do
+	-- If i is 10, i % 10 equals 0, mapping F10 to "F0"
+	local remainder = i % 10
+	local fnKey = "F" .. tostring(remainder)
+	-- Move window to workspace (e.g., SUPER + F1 -> Workspace 1)
+	hl.bind(mainMod .. " + " .. fnKey, hl.dsp.window.move({ workspace = tostring(i) }))
+end
+
+hl.bind("SUPER + SHIFT + M", function()
+	local ws = hl.get_active_workspace()
+	if ws then
+		hl.workspace_rule({ workspace = ws.name, layout = "master" })
+	end
+end)
+
+hl.bind("SUPER + M", function()
+	local ws = hl.get_active_workspace()
+	if not ws then
+		return
+	end
+	local next_layout = (ws.tiled_layout == "monocle") and "master" or "monocle"
+	hl.workspace_rule({ workspace = ws.name, layout = next_layout })
+end)
+
+-- NAVIGATION OVERRIDES
+-- Use this one to bind different actions to the same key binding based on current layout:
+
+local function layout_bind(bind_table)
+	return function()
+		local workspace = hl.get_active_special_workspace() or hl.get_active_workspace()
+
+		if not workspace then
+			return
+		end
+
+		local layout = workspace.tiled_layout
+
+		if bind_table[layout] then
+			hl.dispatch(bind_table[layout])
+		end
+	end
+end
+
+hl.bind("SUPER + left", function()
+	layout_bind({
+		scrolling = hl.dsp.focus({ direction = "left" }),
+		dwindle = hl.dsp.focus({ direction = "left" }),
+		monocle = hl.dsp.layout("cycleprev"),
+		master = hl.dsp.focus({ direction = "left" }),
+	})() -- This executes your layout switch
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" })) -- This raises the window
+end)
+
+hl.bind("SUPER + h", function()
+	layout_bind({
+		scrolling = hl.dsp.focus({ direction = "left" }),
+		dwindle = hl.dsp.focus({ direction = "left" }),
+		monocle = hl.dsp.layout("cycleprev"),
+		master = hl.dsp.focus({ direction = "left" }),
+	})()
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind("SUPER + right", function()
+	layout_bind({
+		scrolling = hl.dsp.focus({ direction = "right" }),
+		dwindle = hl.dsp.focus({ direction = "right" }),
+		monocle = hl.dsp.layout("cyclenext"),
+		master = hl.dsp.focus({ direction = "right" }),
+	})()
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind("SUPER + l", function()
+	layout_bind({
+		scrolling = hl.dsp.focus({ direction = "right" }),
+		dwindle = hl.dsp.focus({ direction = "right" }),
+		monocle = hl.dsp.layout("cyclenext"),
+		master = hl.dsp.focus({ direction = "right" }),
+	})()
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+-- Move focus with mainMod + arrow keys
+--hhl.bind(mainMod .. " + left", hl.dsp.layout("cycleprev"))
+--hl.bind(mainMod .. " + right", hl.dsp.layout("cyclenext"))
+--hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
+--hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
+hl.bind(mainMod .. " + u", hl.dsp.layout("swapwithmaster auto"))
+-- Directional Focus Binds
+hl.bind(mainMod .. " + up", function()
+	hl.dispatch(hl.dsp.focus({ direction = "up" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. " + down", function()
+	hl.dispatch(hl.dsp.focus({ direction = "down" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. " + k", function()
+	hl.dispatch(hl.dsp.focus({ direction = "up" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. " + j", function()
+	hl.dispatch(hl.dsp.focus({ direction = "down" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+-- Vim-style Window Swapping Binds
+hl.bind(mainMod .. "+ SHIFT + h", function()
+	hl.dispatch(hl.dsp.window.swap({ direction = "left" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. "+ SHIFT + l", function()
+	hl.dispatch(hl.dsp.window.swap({ direction = "right" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. " + SHIFT + k", function()
+	hl.dispatch(hl.dsp.window.swap({ direction = "up" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+
+hl.bind(mainMod .. " + SHIFT + j", function()
+	hl.dispatch(hl.dsp.window.swap({ direction = "down" }))
+	hl.dispatch(hl.dsp.window.alter_zorder({ mode = "top" }))
+end)
+---
+---GROUPS
+---
+hl.bind(mainMod .. " + G", hl.dsp.group.toggle())
+-- Move a window out of its group (directionless — just pop it out)
+hl.bind(mainMod .. " + ALT  + G", hl.dsp.window.move({ out_of_group = true }))
+hl.bind(mainMod .. " + SHIFT + G", hl.dsp.group.lock())
+-- Move the focused window into a group in a direction (merges into existing group)
+
+hl.bind(mainMod .. " + ALT + Left", hl.dsp.window.move({ into_or_create_group = "l" }))
+hl.bind(mainMod .. " + ALT + Up ", hl.dsp.window.move({ into_or_create_group = "u" }))
+hl.bind(mainMod .. " + ALT + Down", hl.dsp.window.move({ into_or_create_group = "d" }))
+hl.bind(mainMod .. " + ALT + Right", hl.dsp.window.move({ into_or_create_group = "r" }))
+
+hl.bind(mainMod .. " + ALT + h", hl.dsp.window.move({ into_or_create_group = "l" }))
+hl.bind(mainMod .. " + ALT + k", hl.dsp.window.move({ into_or_create_group = "u" }))
+hl.bind(mainMod .. " + ALT + j", hl.dsp.window.move({ into_or_create_group = "d" }))
+hl.bind(mainMod .. " + ALT + l", hl.dsp.window.move({ into_or_create_group = "r" }))
+
+hl.bind(mainMod .. " + bracketright", hl.dsp.group.next())
+hl.bind(mainMod .. " + bracketleft", hl.dsp.group.prev())
+
+hl.bind("SUPER + ALT + TAB", hl.dsp.group.next())
+hl.bind("SUPER + ALT + SHIFT + TAB", hl.dsp.group.prev())
+
+hl.bind("SUPER + CTRL + LEFT", hl.dsp.group.prev())
+hl.bind("SUPER + CTRL + RIGHT", hl.dsp.group.next())
+
+hl.bind("SUPER + CTRL + h", hl.dsp.group.prev())
+hl.bind("SUPER + CTRL + l", hl.dsp.group.next())
+
+hl.bind("SUPER + ALT + mouse_down", hl.dsp.group.next())
+hl.bind("SUPER + ALT + mouse_up", hl.dsp.group.prev())
+
+for index = 1, 5 do
+	hl.bind("SUPER + ALT + code:" .. tostring(index + 9), function()
+		local w = hl.get_active_window()
+		if w == nil or w.group == nil then
+			return
+		end
+		-- if index > <group size field> then return end
+		hl.dispatch(hl.dsp.group.active({ index = index }))
+	end, { description = "Switch to group window " .. index })
+end
+-- General Hyprland keybinds (shell-independent)
 
 -- === Application Launchers ===
 hl.bind("SUPER + T", hl.dsp.exec_cmd("ghostty"))
@@ -10,29 +212,6 @@ hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "to
 hl.bind("SUPER + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + SHIFT + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + W", hl.dsp.group.toggle())
-
--- === Security ===
-hl.bind("SUPER + SHIFT + E", hl.dsp.exit())
-
--- === Focus Navigation ===
-hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }))
-hl.bind("SUPER + down", hl.dsp.focus({ direction = "d" }))
-hl.bind("SUPER + up", hl.dsp.focus({ direction = "u" }))
-hl.bind("SUPER + right", hl.dsp.focus({ direction = "r" }))
-hl.bind("SUPER + H", hl.dsp.focus({ direction = "l" }))
-hl.bind("SUPER + J", hl.dsp.focus({ direction = "d" }))
-hl.bind("SUPER + K", hl.dsp.focus({ direction = "u" }))
-hl.bind("SUPER + L", hl.dsp.focus({ direction = "r" }))
-
--- === Window Movement ===
-hl.bind("SUPER + SHIFT + left", hl.dsp.window.move({ direction = "l" }))
-hl.bind("SUPER + SHIFT + down", hl.dsp.window.move({ direction = "d" }))
-hl.bind("SUPER + SHIFT + up", hl.dsp.window.move({ direction = "u" }))
-hl.bind("SUPER + SHIFT + right", hl.dsp.window.move({ direction = "r" }))
-hl.bind("SUPER + SHIFT + H", hl.dsp.window.move({ direction = "l" }))
-hl.bind("SUPER + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
-hl.bind("SUPER + SHIFT + K", hl.dsp.window.move({ direction = "u" }))
-hl.bind("SUPER + SHIFT + L", hl.dsp.window.move({ direction = "r" }))
 
 -- === Monitor Navigation ===
 hl.bind("SUPER + CTRL + left", hl.dsp.focus({ monitor = "l" }))
@@ -69,28 +248,6 @@ hl.bind("SUPER + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind("SUPER + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind("SUPER + CTRL + mouse_down", hl.dsp.window.move({ workspace = "e+1" }))
 hl.bind("SUPER + CTRL + mouse_up", hl.dsp.window.move({ workspace = "e-1" }))
-
--- === Numbered Workspaces ===
-hl.bind("SUPER + 1", hl.dsp.focus({ workspace = "1" }))
-hl.bind("SUPER + 2", hl.dsp.focus({ workspace = "2" }))
-hl.bind("SUPER + 3", hl.dsp.focus({ workspace = "3" }))
-hl.bind("SUPER + 4", hl.dsp.focus({ workspace = "4" }))
-hl.bind("SUPER + 5", hl.dsp.focus({ workspace = "5" }))
-hl.bind("SUPER + 6", hl.dsp.focus({ workspace = "6" }))
-hl.bind("SUPER + 7", hl.dsp.focus({ workspace = "7" }))
-hl.bind("SUPER + 8", hl.dsp.focus({ workspace = "8" }))
-hl.bind("SUPER + 9", hl.dsp.focus({ workspace = "9" }))
-
--- === Move to Numbered Workspaces ===
-hl.bind("SUPER + SHIFT + 1", hl.dsp.window.move({ workspace = "1" }))
-hl.bind("SUPER + SHIFT + 2", hl.dsp.window.move({ workspace = "2" }))
-hl.bind("SUPER + SHIFT + 3", hl.dsp.window.move({ workspace = "3" }))
-hl.bind("SUPER + SHIFT + 4", hl.dsp.window.move({ workspace = "4" }))
-hl.bind("SUPER + SHIFT + 5", hl.dsp.window.move({ workspace = "5" }))
-hl.bind("SUPER + SHIFT + 6", hl.dsp.window.move({ workspace = "6" }))
-hl.bind("SUPER + SHIFT + 7", hl.dsp.window.move({ workspace = "7" }))
-hl.bind("SUPER + SHIFT + 8", hl.dsp.window.move({ workspace = "8" }))
-hl.bind("SUPER + SHIFT + 9", hl.dsp.window.move({ workspace = "9" }))
 
 -- === Sizing & Layout ===
 hl.bind("SUPER + R", hl.dsp.layout("togglesplit"))

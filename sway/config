@@ -1,20 +1,15 @@
 set $mod Mod4
-
+include "/home/you/.config/sway/noctalia"
 ### Startup
-exec layman
 exec dbus-update-activation-environment --systemd --all
 exec noctalia
 exec zapzap
+exec autotiling -l 2
 
 ### Look (noctalia colours, gaps from general.lua)
 default_border pixel 2
 default_floating_border pixel 2
-gaps inner 4
-gaps outer 8
 #                       border   bg       text     indicator child_border
-client.focused          #6794e4 #6794e4 #f2f2f3 #6c5cd6 #6794e4
-client.unfocused        #181d25 #181d25 #f2f2f3 #181d25 #181d25
-client.focused_inactive #181d25 #181d25 #f2f2f3 #181d25 #181d25
 seat * xcursor_theme default 42
 
 ### Outputs (adjust eDP-1 position with `swaymsg -t get_outputs`)
@@ -34,7 +29,7 @@ input type:touchpad {
 input type:pointer {
     scroll_factor 2
 }
-
+bindsym $mod+Shift+r reload
 ### Apps
 bindsym $mod+Return exec ghostty
 bindsym $mod+t exec ghostty
@@ -65,14 +60,14 @@ bindsym $mod+k focus up
 bindsym $mod+l focus right
 
 ### Move (through layman so the master/stack stays consistent)
-bindsym $mod+Shift+Left nop layman window move left
-bindsym $mod+Shift+Down nop layman window move down
-bindsym $mod+Shift+Up nop layman window move up
-bindsym $mod+Shift+Right nop layman window move right
-bindsym $mod+Shift+h nop layman window move left
-bindsym $mod+Shift+j nop layman window move down
-bindsym $mod+Shift+k nop layman window move up
-bindsym $mod+Shift+l nop layman window move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
 
 ### Resize
 bindsym $mod+minus resize shrink width 100px
@@ -158,3 +153,5 @@ for_window [app_id="qt6ct"] floating enable
 for_window [app_id="org.gnome.Calculator"] floating enable
 for_window [app_id="nwg-drawer"] floating enable, resize set 600 600
 for_window [app_id="zoom"] floating enable
+
+include ~/.config/sway/noctalia
